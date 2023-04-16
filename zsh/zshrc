@@ -7,7 +7,7 @@ VI_MODE_SET_CURSOR=true
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
 
 #Need this custom plugin to add artisan commands
-#https://github.com/jessarcher/zsh-artisan
+#https://github.com/owrasor/zsh-artisan
 plugins=(
     artisan
     npm
