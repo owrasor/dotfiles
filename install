@@ -9,7 +9,7 @@ if [ "" = "$PKG_OK" ]; then
     sudo apt-get --yes install zsh
 fi
 
-DIR="~/.oh-my-zsh"
+DIR="$HOME/.oh-my-zsh"
 if [ ! -d "$DIR" ]; then
     echo "Checking for oh-my-zsh: not installed"
     PKG_CURL_OK=$(dpkg-query -W --showformat='${Status}\n' curl | grep "install ok installed")
@@ -25,7 +25,7 @@ else
     echo "Checking for oh-my-zsh: installed"
 fi
 
-DIR="~/.oh-my-zsh/custom/plugins/artisan"
+DIR="$HOME/.oh-my-zsh/custom/plugins/artisan"
 if [ ! -d "$DIR" ]; then
     echo "Checking for zsh-artisan plugin: not installed"
     PKG_CURL_OK=$(dpkg-query -W --showformat='${Status}\n' curl | grep "install ok installed")
@@ -36,7 +36,7 @@ if [ ! -d "$DIR" ]; then
     fi
 
     echo "No zsh-artisan plugin. Setting up zsh-artisan"
-    git clone https://github.com/owrasor/zsh-artisan.git ~/.oh-my-zsh/custom/plugins/artisan
+    git clone https://github.com/owrasor/zsh-artisan.git ${$HOME}/.oh-my-zsh/custom/plugins/artisan
 else
     echo "Checking for zsh-artisan plugin: installed"
 fi
