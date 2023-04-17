@@ -36,7 +36,7 @@ if [ ! -d "$DIR" ]; then
     fi
 
     echo "No zsh-artisan plugin. Setting up zsh-artisan"
-    git clone https://github.com/owrasor/zsh-artisan.git ${$HOME}/.oh-my-zsh/custom/plugins/artisan
+    git clone https://github.com/owrasor/zsh-artisan.git ~/.oh-my-zsh/custom/plugins/artisan
 else
     echo "Checking for zsh-artisan plugin: installed"
 fi
