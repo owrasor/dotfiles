@@ -39,6 +39,7 @@ path=(
     $HOME/.config/composer/vendor/bin
     $HOME/.go/bin
     $HOME/.cargo/bin
+    $HOME/App/PhpStorm-231.8109.199/bin
     ./vendor/bin
     ${ANDROID_HOME}tools/
     ${ANDROID_HOME}platform-tools/
@@ -81,10 +82,14 @@ alias nah="git reset --hard;git clean -df"
 alias co="git checkout"
 alias main='git checkout $([ `git rev-parse --quiet --verify master` ] && echo "master" || echo "main")'
 alias glg='git log --oneline --decorate --color --graph'
+alias gclean='git branch --merged | grep -v "\*" | xargs -n 1 git branch -d'
 
 # Docker
 alias d="docker"
 alias dc="docker-compose"
+
+#PHPSTORM
+alias pstorm="phpstorm.sh"
 
 open () {
     xdg-open $* > /dev/null 2>&1
