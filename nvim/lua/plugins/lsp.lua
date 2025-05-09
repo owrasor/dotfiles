@@ -1,8 +1,9 @@
 return {
 	{
 		"williamboman/mason.nvim",
+		tag = "v1.11.0",
 		dependencies = {
-			"williamboman/mason-lspconfig.nvim",
+			{ "williamboman/mason-lspconfig.nvim", tag = "v1.32.0" },
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 		},
 		config = function()
@@ -103,7 +104,7 @@ return {
 					documentation = cmp.config.window.bordered(),
 				},
 				mapping = cmp.mapping.preset.insert({
-					["<Tab>"] = cmp.mapping(function(fallback)
+					["<C-Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_next_item()
 						elseif luasnip.locally_jumpable(1) then

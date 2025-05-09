@@ -31,7 +31,7 @@ return {
 			local builtin = require("telescope.builtin")
 			keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>", { desc = "Fuzzy find files in cwd" })
 			keymap.set("n", "<leader>o", "<cmd>Telescope oldfiles<cr>", { desc = "Fuzzy find recent files" })
-			keymap.set("n", "<leader>/", "<cmd>Telescope live_grep<cr>", { desc = "Find string in cwd" })
+			-- keymap.set("n", "<leader>/", "<cmd>Telescope live_grep<cr>", { desc = "Find string in cwd" })
 			keymap.set(
 				"n",
 				"<leader>sc",
@@ -39,7 +39,11 @@ return {
 				{ desc = "Find string under cursor in cwd" }
 			)
 			keymap.set("n", "<C-t>", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
-			keymap.set("n", "<leader>gr", builtin.lsp_document_symbols, { desc = "Find symbols" })
+			keymap.set("n", "<leader>ss", builtin.lsp_document_symbols, { desc = "Find symbols" })
+			keymap.set("n", "<leader>sb", builtin.buffers, { desc = "Find Buffers" })
+			keymap.set("n", "<leader>re", builtin.lsp_references, { desc = "Find references" })
+
+			require("config.telescope.multigrep").setup()
 		end,
 	},
 	{
