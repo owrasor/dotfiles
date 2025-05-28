@@ -1,7 +1,7 @@
 return {
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.8",
+		-- tag = "0.1.8",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
@@ -41,7 +41,7 @@ return {
 			keymap.set("n", "<C-t>", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 			keymap.set("n", "<leader>ss", builtin.lsp_document_symbols, { desc = "Find symbols" })
 			keymap.set("n", "<leader>sb", builtin.buffers, { desc = "Find Buffers" })
-			keymap.set("n", "<leader>re", builtin.lsp_references, { desc = "Find references" })
+			keymap.set("n", "<leader>sr", builtin.lsp_references, { desc = "Find references" })
 
 			require("config.telescope.multigrep").setup()
 		end,
