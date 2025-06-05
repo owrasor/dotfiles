@@ -23,3 +23,8 @@ end, { desc = "Previous todo comment" })
 vim.keymap.set("n", "]t", function()
 	require("todo-comments").jump_next({ keywords = { "ERROR", "WARNING" } })
 end, { desc = "Next error/warning todo comment" })
+
+vim.keymap.set("n", "<C-e>", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+-- Database commands
+vim.keymap.set("n", "<C-i>", "<CMD>DBUIToggle<CR>", { desc = "Open database" })
