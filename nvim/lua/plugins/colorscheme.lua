@@ -23,6 +23,8 @@ return {
 					floats = "dark",
 				},
 			})
+
+			-- ColorMyPencils("tokyonight")
 		end,
 	},
 	{
@@ -34,8 +36,7 @@ return {
 		config = function()
 			require("rose-pine").setup({ disable_background = true })
 
-			ColorMyPencils("catppuccin")
-			-- load the colorscheme here
+			ColorMyPencils("rose-pine")
 		end,
 	},
 	{
@@ -50,6 +51,17 @@ return {
 					dark = "mocha",
 				},
 			})
+
+			-- ColorMyPencils("catppuccin")
+		end,
+	},
+	{
+		"gambhirsharma/vesper.nvim",
+		lazy = false,
+		priority = 1000,
+		name = "vesper",
+		config = function()
+			-- ColorMyPencils("vesper")
 		end,
 	},
 }

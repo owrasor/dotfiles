@@ -28,3 +28,22 @@ vim.keymap.set("n", "<C-e>", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
 -- Database commands
 vim.keymap.set("n", "<C-i>", "<CMD>DBUIToggle<CR>", { desc = "Open database" })
+
+local function toggle_diffview()
+	local view = require("diffview.lib").get_current_view()
+	if view then
+		vim.cmd("DiffviewClose")
+	else
+		vim.cmd("DiffviewOpen")
+	end
+end
+
+-- Mapeie o atalho, por exemplo <leader>d
+vim.keymap.set("n", "<leader>df", toggle_diffview, { desc = "Toggle Diffview" })
+
+vim.keymap.set(
+	"n",
+	"<leader>fr",
+	[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+	{ desc = "Replace word under cursor" }
+)
