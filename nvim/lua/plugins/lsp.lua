@@ -1,5 +1,49 @@
 return {
 	{
+		"saghen/blink.cmp",
+		version = "1.*",
+		dependencies = { "L3MON4D3/LuaSnip", version = "v2.*" },
+		opts = {
+			-- snippets = { preset = "luasnip" },
+			completion = {
+				list = {
+					selection = {
+						preselect = true,
+						auto_insert = true,
+					},
+				},
+			},
+			sources = {
+				default = { "lsp", "path", "snippets", "buffer" },
+				per_filetype = {
+					sql = { "snippets", "dadbod", "buffer" },
+				},
+				-- add vim-dadbod-completion to your completion providers
+				providers = {
+					dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
+				},
+			},
+			keymap = {
+				-- set to 'none' to disable the 'default' preset
+				preset = "default",
+
+				["<Up>"] = { "select_prev", "fallback" },
+				["<Down>"] = { "select_next", "fallback" },
+
+				-- disable a keymap from the preset
+				["<C-e>"] = {},
+
+				-- show with a list of providers
+				["<C-space>"] = {
+					function(cmp)
+						cmp.show({ providers = { "lsp", "path", "snippets", "buffer" } })
+					end,
+				},
+				["<cr>"] = { "accept", "fallback" },
+			},
+		},
+	},
+	{
 		"mason-org/mason.nvim",
 		tag = "v2.0.0",
 		event = { "BufReadPre", "BufNewFile" },
@@ -54,6 +98,7 @@ return {
 				automatic_enable = true,
 				ensure_installed = {
 					"ts_ls",
+					-- "vtsls", -- vue typescript language server
 					"vue_ls",
 					"html",
 					"cssls",

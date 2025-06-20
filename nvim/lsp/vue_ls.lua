@@ -1,146 +1,55 @@
-vim.lsp.config("vue_ls", {
+local vue_ls_typescript_path = vim.fn.expand("$MASON/packages")
+	.. "/vue-language-server"
+	.. "/node_modules/typescript/lib"
+
+local vue_ls_config = {
 	filetypes = { "vue" },
 	init_options = {
 		typescript = {
 			-- Verificar uma forma de pegar o caminho sem a necessidade de informar o fullpath do mason
-			tsdk = "/Users/owrasor/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
+			tsdk = vue_ls_typescript_path,
 		},
 		vue = {
 			hybridMode = true,
 		},
 	},
-})
+}
 
--- used to enable autocompletion (assign to every lsp server config)
--- local capabilities = cmp_nvim_lsp.default_capabilities()
+-- local vue_ls_config = {
+-- 	on_init = function(client)
+-- 		client.handlers["tsserver/request"] = function(_, result, context)
+-- 			local clients = vim.lsp.get_clients({ bufnr = context.bufnr, name = "vtsls" })
+-- 			if #clients == 0 then
+-- 				vim.notify(
+-- 					"Could not found `vtsls` lsp client, vue_lsp would not work without it.",
+-- 					vim.log.levels.ERROR
+-- 				)
+-- 				return
+-- 			end
+-- 			local ts_client = clients[1]
+--
+-- 			vim.notify(ts_client.name .. " is handling the request", vim.log.levels.INFO)
+--
+-- 			local param = unpack(result)
+-- 			local id, command, payload = unpack(param)
+--
+-- 			vim.notify(command .. " " .. id, vim.log.levels.INFO)
+--
+-- 			ts_client:exec_cmd({
+-- 				title = "Vue Language Server Request",
+-- 				command = "typescript.tsserverRequest",
+-- 				arguments = {
+-- 					command,
+-- 					payload,
+-- 				},
+-- 			}, { bufnr = context.bufnr }, function(_, r)
+-- 				local response_data = { { id, r.body } }
+-- 				---@diagnostic disable-next-line: param-type-mismatch
+-- 				client:notify("tsserver/response", response_data)
+-- 			end)
+-- 		end
+-- 	end,
+-- }
 
--- Change the Diagnostic symbols in the sign column (gutter)
--- (not in youtube nvim video)
--- local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
--- for type, icon in pairs(signs) do
--- 	local hl = "DiagnosticSign" .. type
--- 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
--- end
---
--- mason_lspconfig.setup_handlers({
--- 	-- default handler for installed servers
--- 	function(server_name)
--- 		lspconfig[server_name].setup({
--- 			capabilities = capabilities,
--- 		})
--- 	end,
--- 	["svelte"] = function()
--- 		-- configure svelte server
--- 		lspconfig["svelte"].setup({
--- 			capabilities = capabilities,
--- 			on_attach = function(client)
--- 				vim.api.nvim_create_autocmd("BufWritePost", {
--- 					pattern = { "*.js", "*.ts" },
--- 					callback = function(ctx)
--- 						-- Here use ctx.match instead of ctx.file
--- 						client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
--- 					end,
--- 				})
--- 			end,
--- 		})
--- 	end,
--- 	["graphql"] = function()
--- 		-- configure graphql language server
--- 		lspconfig["graphql"].setup({
--- 			capabilities = capabilities,
--- 			filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
--- 		})
--- 	end,
--- 	["emmet_ls"] = function()
--- 		-- configure emmet language server
--- 		lspconfig["emmet_ls"].setup({
--- 			capabilities = capabilities,
--- 			filetypes = {
--- 				"html",
--- 				"typescriptreact",
--- 				"javascriptreact",
--- 				"css",
--- 				"sass",
--- 				"scss",
--- 				"less",
--- 				"svelte",
--- 			},
--- 		})
--- 	end,
--- 	["lua_ls"] = function()
--- 		-- configure lua server (with special settings)
--- 		lspconfig["lua_ls"].setup({
--- 			capabilities = capabilities,
--- 			settings = {
--- 				Lua = {
--- 					-- make the language server recognize "vim" global
--- 					diagnostics = {
--- 						globals = { "vim" },
--- 					},
--- 					completion = {
--- 						callSnippet = "Replace",
--- 					},
--- 				},
--- 			},
--- 		})
--- 	end,
--- 	["intelephense"] = function()
--- 		lspconfig["intelephense"].setup({
--- 			commands = {
--- 				IntelephenseIndex = {
--- 					function()
--- 						vim.lsp.buf.execute_command({ command = "intelephense.index.workspace" })
--- 					end,
--- 				},
--- 			},
--- 			on_attach = function(client, _)
--- 				client.server_capabilities.documentFormattingProvider = false
--- 				client.server_capabilities.documentRangeFormattingProvider = false
--- 			end,
--- 			capabilities = capabilities,
--- 		})
--- 	end,
--- 	["ts_ls"] = function()
--- 		local mason_registry = require("mason-registry")
--- 		local vue_language_server_path = mason_registry
--- 			.get_package("vue-language-server")
--- 			:get_install_path() .. "/node_modules/@vue/language-server"
---
--- 		lspconfig["ts_ls"].setup({
--- 			init_options = {
--- 				plugins = {
--- 					{
--- 						name = "@vue/typescript-plugin",
--- 						location = vue_language_server_path,
--- 						languages = { "vue" },
--- 					},
--- 				},
--- 			},
--- 			filetypes = {
--- 				"typescript",
--- 				"javascript",
--- 				"javascriptreact",
--- 				"typescriptreact",
--- 				"vue",
--- 			},
--- 			capabilities = capabilities,
--- 		})
--- 	end,
--- 	["volar"] = function()
--- 		local mason_registry = require("mason-registry")
--- 		local ts_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path()
--- 			.. "/node_modules/typescript/lib"
---
--- 		lspconfig["volar"].setup({
--- 			init_options = {
--- 				typescript = {
--- 					tsdk = ts_language_server_path,
--- 				},
--- 				vue = {
--- 					hybridMode = false,
--- 				},
--- 			},
--- 			filetypes = { "vue" },
--- 			capabilities = capabilities,
--- 		})
--- 	end,
+-- nvim 0.11 or above
+vim.lsp.config("vue_ls", vue_ls_config)

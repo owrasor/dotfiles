@@ -1,0 +1,17 @@
+{
+  "prif": {
+    "prefix": "prif",
+    "body": ["private function ${1}(${2}): $3", "{", "\t${0}", "}"],
+    "description": "private method"
+  },
+  "prof": {
+    "prefix": "prof",
+    "body": ["protected function ${1}(${2}): $3", "{", "\t${0}", "}"],
+    "description": "protected method"
+  },
+  "pubf": {
+    "prefix": "pubf",
+    "body": ["public function ${1}(${2}): $3", "{", "\t${0}", "}"],
+    "description": "public method"
+  }
+}
