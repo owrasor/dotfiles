@@ -6,6 +6,7 @@ vim.g.loaded_netrwPlugin = 1
 -- This is also a good place to setup other settings (vim.opt)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
+vim.g.editorconfig = true
 
 local opt = vim.opt
 
@@ -14,9 +15,11 @@ opt.number = true
 
 -- TABS e Identações
 opt.tabstop = 4
+opt.softtabstop = 4
 opt.shiftwidth = 4
 opt.expandtab = true
 opt.autoindent = true
+opt.smartindent = true
 
 opt.wrap = false
 
@@ -31,6 +34,7 @@ opt.cursorline = true
 opt.termguicolors = true
 opt.background = "dark"
 opt.signcolumn = "yes"
+opt.scrolloff = 8
 
 -- backspace
 opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position

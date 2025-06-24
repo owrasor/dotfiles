@@ -1,3 +1,7 @@
+-- Move blocks up and down
+vim.keymap.set("v", "<M-Down>", ":m '>+1<CR>gv=gv", { desc = "Move lines down in visual selection" })
+vim.keymap.set("v", "<M-Up>", ":m '<-2<CR>gv=gv", { desc = "Move lines up in visual selection" })
+
 -- Clear search highlighting.
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
@@ -8,6 +12,7 @@ vim.keymap.set("v", "Y", "myY`y")
 
 -- Paste replace visual selection without copying it.
 vim.keymap.set("v", "p", '"_dP')
+vim.keymap.set("v", "x", '"_x')
 
 -- TODO keymaps
 vim.keymap.set("n", "]t", function()

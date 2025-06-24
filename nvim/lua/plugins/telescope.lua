@@ -13,6 +13,19 @@ return {
 			local actions = require("telescope.actions")
 
 			telescope.setup({
+				pickers = {
+					buffers = {
+						show_all_buffers = true,
+						sort_lastused = true,
+						-- theme = "dropdown",
+						previewer = true,
+						mappings = {
+							i = {
+								["<M-d>"] = "delete_buffer",
+							},
+						},
+					},
+				},
 				defaults = {
 					path_display = { "smart" },
 					mappings = {
@@ -38,7 +51,7 @@ return {
 				"<cmd>Telescope grep_string<cr>",
 				{ desc = "Find string under cursor in cwd" }
 			)
-			keymap.set("n", "<C-t>", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
+			keymap.set("n", "<leader>st", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 			keymap.set("n", "<leader>ss", builtin.lsp_document_symbols, { desc = "Find symbols" })
 			keymap.set("n", "<leader>sb", builtin.buffers, { desc = "Find Buffers" })
 			keymap.set("n", "<leader>sr", builtin.lsp_references, { desc = "Find references" })
