@@ -3,6 +3,7 @@ local vue_ls_typescript_path = vim.fn.expand("$MASON/packages")
 	.. "/node_modules/typescript/lib"
 
 local vue_ls_config = {
+	-- cmd = { "npm", "vue-language-server", "--stdio" },
 	filetypes = { "vue" },
 	init_options = {
 		typescript = {
@@ -10,7 +11,7 @@ local vue_ls_config = {
 			tsdk = vue_ls_typescript_path,
 		},
 		vue = {
-			hybridMode = true,
+			hybridMode = false,
 		},
 	},
 }
