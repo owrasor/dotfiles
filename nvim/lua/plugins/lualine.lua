@@ -18,9 +18,9 @@ return {
 						cond = require("noice").api.status.mode.has,
 						color = { fg = "#ff9e64" },
 					},
-					-- { "encoding" },
-					-- { "fileformat" },
-					{ "filetype" },
+					{ "linter_status()" },
+					{ "formatter_status()" },
+					{ "lsp_status" },
 				},
 			},
 		})

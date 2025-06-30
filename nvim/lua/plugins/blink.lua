@@ -8,7 +8,6 @@ return {
 			vim.cmd("highlight PmenuExtra guibg=none")
 			vim.cmd("highlight FloatBorder guibg=none")
 			vim.cmd("highlight NormalFloat guibg=none")
-
 			require("blink.cmp").setup({
 				snippets = { preset = "luasnip" },
 				signature = { enabled = true },
@@ -20,7 +19,8 @@ return {
 					-- per_filetype = {
 					--     codecompanion = { "codecompanion" },
 					-- },
-					default = { "laravel", "lazydev", "lsp", "path", "snippets", "buffer" },
+					-- default = { "laravel", "lazydev", "lsp", "path", "snippets", "buffer" },
+					default = { "lazydev", "lsp", "path", "snippets", "buffer" },
 					per_filetype = {
 						sql = { "snippets", "dadbod", "buffer" },
 					},
@@ -31,16 +31,16 @@ return {
 							module = "lazydev.integrations.blink",
 							score_offset = 100,
 						},
-						laravel = {
-							name = "Laravel",
-							module = "laravel.blink_source",
-							enabled = function()
-								return vim.bo.filetype == "php" or vim.bo.filetype == "blade"
-							end,
-							kind = "Laravel",
-							score_offset = 1000, -- Highest priority
-							min_keyword_length = 1,
-						},
+						-- laravel = {
+						-- 	name = "Laravel",
+						-- 	module = "laravel.blink_source",
+						-- 	enabled = function()
+						-- 		return vim.bo.filetype == "php" or vim.bo.filetype == "blade"
+						-- 	end,
+						-- 	kind = "Laravel",
+						-- 	score_offset = 1000, -- Highest priority
+						-- 	min_keyword_length = 1,
+						-- },
 						dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
 						cmdline = {
 							min_keyword_length = 2,

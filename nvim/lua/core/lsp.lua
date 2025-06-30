@@ -1,10 +1,7 @@
 -- Mason PATH is handled by core.mason-path
 vim.lsp.enable({
 	"lua-ls",
-	"gopls",
-	"zls",
 	"ts-ls",
-	"rust-analyzer",
 	"intelephense",
 	"tailwindcss",
 	"html-ls",
@@ -56,55 +53,6 @@ end
 vim.api.nvim_create_user_command("LspRestart", function()
 	restart_lsp()
 end, {})
-
-local function lsp_status()
-	local bufnr = vim.api.nvim_get_current_buf()
-	local clients = vim.lsp.get_clients({ bufnr = bufnr })
-
-	if #clients == 0 then
-		print("󰅚 No LSP clients attached")
-		return
-	end
-
-	print("󰒋 LSP Status for buffer " .. bufnr .. ":")
-	print("─────────────────────────────────")
-
-	for i, client in ipairs(clients) do
-		print(string.format("󰌘 Client %d: %s (ID: %d)", i, client.name, client.id))
-		print("  Root: " .. (client.config.root_dir or "N/A"))
-		print("  Filetypes: " .. table.concat(client.config.filetypes or {}, ", "))
-
-		-- Check capabilities
-		local caps = client.server_capabilities
-		local features = {}
-		if caps.completionProvider then
-			table.insert(features, "completion")
-		end
-		if caps.hoverProvider then
-			table.insert(features, "hover")
-		end
-		if caps.definitionProvider then
-			table.insert(features, "definition")
-		end
-		if caps.referencesProvider then
-			table.insert(features, "references")
-		end
-		if caps.renameProvider then
-			table.insert(features, "rename")
-		end
-		if caps.codeActionProvider then
-			table.insert(features, "code_action")
-		end
-		if caps.documentFormattingProvider then
-			table.insert(features, "formatting")
-		end
-
-		print("  Features: " .. table.concat(features, ", "))
-		print("")
-	end
-end
-
-vim.api.nvim_create_user_command("LspStatus", lsp_status, { desc = "Show detailed LSP status" })
 
 local function check_lsp_capabilities()
 	local bufnr = vim.api.nvim_get_current_buf()
@@ -284,36 +232,6 @@ end
 -- Create command
 vim.api.nvim_create_user_command("LspInfo", lsp_info, { desc = "Show comprehensive LSP information" })
 
-local function lsp_status_short()
-	local bufnr = vim.api.nvim_get_current_buf()
-	local clients = vim.lsp.get_clients({ bufnr = bufnr })
-
-	if #clients == 0 then
-		return "" -- Return empty string when no LSP
-	end
-
-	local names = {}
-	for _, client in ipairs(clients) do
-		table.insert(names, client.name)
-	end
-
-	return "󰒋 " .. table.concat(names, ",")
-end
-
-local function git_branch()
-	local ok, handle = pcall(io.popen, "git branch --show-current 2>/dev/null")
-	if not ok or not handle then
-		return ""
-	end
-	local branch = handle:read("*a")
-	handle:close()
-	if branch and branch ~= "" then
-		branch = branch:gsub("\n", "")
-		return "󰊢 " .. branch
-	end
-	return ""
-end
-
 local function formatter_status()
 	local ok, conform = pcall(require, "conform")
 	if not ok then
@@ -346,16 +264,6 @@ local function linter_status()
 
 	return "󰁨 " .. table.concat(linters, ",")
 end
--- Safe wrapper functions for statusline
-local function safe_git_branch()
-	local ok, result = pcall(git_branch)
-	return ok and result or ""
-end
-
-local function safe_lsp_status()
-	local ok, result = pcall(lsp_status_short)
-	return ok and result or ""
-end
 
 local function safe_formatter_status()
 	local ok, result = pcall(formatter_status)
@@ -367,21 +275,5 @@ local function safe_linter_status()
 	return ok and result or ""
 end
 
-_G.git_branch = safe_git_branch
-_G.lsp_status = safe_lsp_status
 _G.formatter_status = safe_formatter_status
 _G.linter_status = safe_linter_status
-
--- THEN set the statusline
-vim.opt.statusline = table.concat({
-	"%{v:lua.git_branch()}", -- Git branch
-	"%f", -- File name
-	"%m", -- Modified flag
-	"%r", -- Readonly flag
-	"%=", -- Right align
-	"%{v:lua.linter_status()}", -- Linter status
-	"%{v:lua.formatter_status()}", -- Formatter status
-	"%{v:lua.lsp_status()}", -- LSP status
-	" %l:%c", -- Line:Column
-	" %p%%", -- Percentage through file
-}, " ")
