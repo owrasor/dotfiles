@@ -29,4 +29,15 @@ require("lazy").setup({
 	install = { colorscheme = { "catppuccin" } },
 	-- automatically check for plugin updates
 	checker = { enabled = true, notify = false },
+	performance = {
+		rtp = {
+			disabled_plugins = {
+				"gzip",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+			},
+		},
+	},
 })

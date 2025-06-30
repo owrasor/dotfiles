@@ -1,16 +1,23 @@
--- local capabilities = require("blink.cmp").get_lsp_capabilities()
+local blink = require("blink.cmp")
 
-vim.lsp.config("intelephense", {
-	commands = {
-		IntelephenseIndex = {
-			function()
-				vim.lsp.buf.execute_command({ command = "intelephense.index.workspace" })
-			end,
-		},
+local get_intelephense_license = function()
+	local f = assert(io.open(os.getenv("HOME") .. "/intelephense/license.txt", "rb"))
+	local content = f:read("*a")
+	f:close()
+	return string.gsub(content, "%s+", "")
+end
+
+return {
+	cmd = { "intelephense", "--stdio" },
+	filetypes = { "php", "blade" },
+	root_markers = { "composer.json", ".git" },
+	init_options = {
+		licenceKey = get_intelephense_license(),
 	},
-	on_attach = function(client, _)
-		client.server_capabilities.documentFormattingProvider = false
-		client.server_capabilities.documentRangeFormattingProvider = false
-	end,
-	-- capabilities = capabilities,
-})
+	capabilities = vim.tbl_deep_extend(
+		"force",
+		{},
+		vim.lsp.protocol.make_client_capabilities(),
+		blink.get_lsp_capabilities()
+	),
+}
