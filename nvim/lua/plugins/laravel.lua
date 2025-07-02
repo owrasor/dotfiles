@@ -1,23 +1,21 @@
 return {
-	-- {
-	-- 	"adibhanna/laravel.nvim",
-	-- 	ft = { "php", "blade" },
-	-- 	dependencies = {
-	-- 		"MunifTanjim/nui.nvim",
-	-- 		"nvim-lua/plenary.nvim",
-	-- 	},
-	-- 	cmd = { "Artisan", "Composer", "Laravel*" },
-	-- 	keys = {
-	-- 		{ "<leader>La", ":Artisan<cr>", desc = "Laravel Artisan" },
-	-- 		{ "<leader>Lc", ":Composer<cr>", desc = "Composer" },
-	-- 		{ "<leader>Lr", ":LaravelRoute<cr>", desc = "Laravel Routes" },
-	-- 		{ "<leader>Lm", ":LaravelMake<cr>", desc = "Laravel Make" },
-	-- 	},
-	-- 	event = { "VeryLazy" },
-	-- 	config = function()
-	-- 		require("laravel").setup()
-	-- 	end,
-	-- },
+	{
+		"adibhanna/laravel.nvim",
+		ft = { "php", "blade" },
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+			"nvim-lua/plenary.nvim",
+		},
+		keys = {
+			{ "<leader>Lr", ":LaravelRoute<cr>", desc = "Laravel Routes" },
+			{ "<leader>Lm", ":LaravelMake<cr>", desc = "Laravel Make" },
+			{ "<leader>Ls", ":LaravelStatus<cr>", desc = "Laravel status" },
+		},
+		event = { "VeryLazy" },
+		config = function()
+			require("laravel").setup()
+		end,
+	},
 	-- {
 	--   dir = "~/Developer/opensource/phprefactoring.nvim",
 	--   -- 'adibhanna/phprefactoring.nvim',

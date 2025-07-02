@@ -7,7 +7,9 @@ return {
 		bigfile = { enabled = true },
 		dashboard = { enabled = true },
 		explorer = { enabled = true },
-		indent = { enabled = true },
+		indent = {
+			enabled = true,
+		},
 		picker = {
 			enabled = true,
 			sources = {
@@ -17,6 +19,7 @@ return {
 		quickfile = { enabled = true },
 		scroll = { enabled = false },
 		words = { enabled = true },
+		styles = {},
 	},
 	keys = {
 		-- Top Pickers & Explorer
@@ -37,7 +40,9 @@ return {
 		{
 			"<leader>e",
 			function()
-				Snacks.explorer()
+				Snacks.explorer({
+					layout = { layout = { position = "right", width = 70 } },
+				})
 			end,
 			desc = "File Explorer",
 		},
@@ -67,7 +72,7 @@ return {
 			desc = "Find Config File",
 		},
 		{
-			"<leader>f",
+			"<leader>ff",
 			function()
 				Snacks.picker.files()
 			end,
