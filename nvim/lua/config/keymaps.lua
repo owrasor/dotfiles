@@ -14,6 +14,9 @@ vim.keymap.set("v", "Y", "myY`y")
 vim.keymap.set("v", "p", '"_dP')
 vim.keymap.set("v", "x", '"_x')
 
+vim.keymap.set("n", "<leader>cn", ':let @* = expand("%:t")<cr>', { desc = "Copy filename of current file to registry" })
+vim.keymap.set("n", "<leader>cp", ':let @* = expand("%")<cr>', { desc = "Copy path of current file to registry" })
+
 -- TODO keymaps
 vim.keymap.set("n", "]t", function()
 	require("todo-comments").jump_next()
