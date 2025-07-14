@@ -1,15 +1,3 @@
--- Mason PATH is handled by core.mason-path
--- vim.lsp.enable({
--- 	"lua_ls",
--- 	-- "ts_ls",
--- 	"vtsls",
--- 	"intelephense",
--- 	"tailwindcss",
--- 	"html_ls",
--- 	"css_ls",
--- 	"vue_ls",
--- })
-
 local function restart_lsp(bufnr)
 	bufnr = bufnr or vim.api.nvim_get_current_buf()
 	local clients = vim.lsp.get_clients({ bufnr = bufnr })
