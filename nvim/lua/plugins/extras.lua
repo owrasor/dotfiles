@@ -47,4 +47,38 @@ return {
 			{ "<leader>h4", "<cmd>lua require('harpoon.ui').nav_file(4)<CR>", desc = "Navigate to file 4" },
 		},
 	},
+	{
+		"voldikss/vim-floaterm",
+		keys = {
+			{ "<F1>", ":FloatermToggle<CR>" },
+			{ "<F1>", "<Esc>:FloatermToggle<CR>", mode = "i" },
+			{ "<F1>", "<C-\\><C-n>:FloatermToggle<CR>", mode = "t" },
+		},
+		cmd = { "FloatermToggle" },
+		init = function()
+			vim.g.floaterm_width = 0.8
+			vim.g.floaterm_height = 0.8
+		end,
+	},
+	{
+		"nvim-neo-tree/neo-tree.nvim",
+		branch = "v3.x",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+			"MunifTanjim/nui.nvim",
+			-- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
+		},
+		config = function()
+			require("neo-tree").setup({})
+
+			local keymap = vim.keymap -- for conciseness
+			keymap.set(
+				"n",
+				"<leader>e",
+				"<cmd>Neotree reveal=true position=float toggle<cr>",
+				{ desc = "Open or Close explorer" }
+			)
+		end,
+	},
 }
