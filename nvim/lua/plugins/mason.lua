@@ -51,9 +51,10 @@ return {
 			})
 
 			mason_lspconfig.setup({
-				automatic_enable = false,
+				automatic_enable = true,
 				ensure_installed = {
-					"ts_ls",
+					-- "ts_ls",
+					"vtsls",
 					"vue_ls",
 					"html",
 					"cssls",

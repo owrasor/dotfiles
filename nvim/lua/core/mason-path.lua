@@ -37,7 +37,11 @@
 -- work reliably by ensuring the right tools are found in the right order.
 
 local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
+local mason_packages = vim.fn.stdpath("data") .. "/mason/packages"
 local current_path = vim.env.PATH or ""
+
+-- Set MASON environment variable for use in LSP configs
+vim.env.MASON = vim.fn.stdpath("data") .. "/mason"
 
 -- Remove any existing Mason bin entries to prevent duplicates
 local path_entries = vim.split(current_path, ":")
@@ -60,4 +64,10 @@ vim.env.PATH = new_path
 if vim.fn.isdirectory(mason_bin) == 0 then
 	-- Mason not installed yet, create placeholder
 	vim.fn.mkdir(mason_bin, "p")
+end
+
+-- Verify Mason packages directory exists
+if vim.fn.isdirectory(mason_packages) == 0 then
+	-- Mason not installed yet, create placeholder
+	vim.fn.mkdir(mason_packages, "p")
 end
