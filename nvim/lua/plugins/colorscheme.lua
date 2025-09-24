@@ -36,7 +36,7 @@ return {
 		config = function()
 			require("rose-pine").setup({ disable_background = true })
 
-			ColorMyPencils("rose-pine")
+			-- ColorMyPencils("rose-pine")
 		end,
 	},
 	{
@@ -52,7 +52,7 @@ return {
 				},
 			})
 
-			-- ColorMyPencils("catppuccin")
+			ColorMyPencils("catppuccin")
 		end,
 	},
 	{
