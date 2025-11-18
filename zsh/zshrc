@@ -59,22 +59,30 @@ zstyle ':completion:*:complete:(cd|pushd):*' tag-order \
 
 export EDITOR=vim
 export GIT_EDITOR=vim
-export NVIM_LISTEN_ADDRESS=/tmp/nvimsocket
 export ARTISAN_OPEN_ON_MAKE_EDITOR=nvr
 export FZF_DEFAULT_COMMAND='ag -u -g ""'
 
 unsetopt sharehistory
 
-# Example aliases
-alias vim="nvim"
-alias sail='[ -f sail ] && sail || vendor/bin/sail'
+# -----------------------------------------------------------------------------
+# ALIASES
+# -----------------------------------------------------------------------------
 
-# Laravel
+# Artisan
 alias a="artisan"
-alias tinker="artisan tinker"
-alias serve="artisan serve"
-alias mfs="artisan migrate:fresh --seed"
-
+alias server="a serve"
+alias horizon="a horizon"
+alias mfs="a migrate:fresh --seed"
+alias tinker="a tinker"
+alias m="a migrate"
+alias rl="a route:list"
+alias horizon="a horizon"
+alias key="a key:generate"
+alias t="a test"
+alias tp="a test --parallel"
+alias tc="a test --compact"
+alias pint="./vendor/bin/pint"
+#
 # Git
 alias g="git"
 alias gs="git s"
@@ -86,10 +94,543 @@ alias gclean='git branch --merged | grep -v "\*" | xargs -n 1 git branch -d'
 
 # Docker
 alias d="docker"
-alias dc="docker-compose"
+alias dc="docker compose"
 
 #PHPSTORM
 alias pstorm="phpstorm.sh"
+
+
+# Composer
+alias c="composer"
+alias ci="composer install"
+alias cu="composer update"
+alias cdump="composer dump-autoload"
+
+# Node & NPM
+alias nd="npm run dev"
+alias nf="npm run front"
+alias ni="npm install"
+alias nu="npm update"
+
+# Minio
+alias minio_serve="minio server ~/Code/minio"
+
+# Takeout
+alias takeout="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --add-host=host.docker.internal:host-gateway -it tighten/takeout:latest"
+
+#love
+alias love="/Applications/love.app/Contents/MacOS/love"
+
+
+# Create symbolic link to Herd
+function unlink_herd() {
+    project=$1
+    full_directory=$(pwd)
+
+    if [ -z "$project" ]; then
+        project=$(basename "$PWD")
+    fi
+
+    eval "rm ~/Herd/$project/$full_directory"
+}
+
+# Create symbolic link to Herd
+function link_herd() {
+    project=$1
+    full_directory=$(pwd)
+
+    if [ -z "$project" ]; then
+        project=$(basename "$PWD")
+    fi
+
+    eval "ln -s $full_directory ~/Herd/$project"
+}
+
+# Create symbolic proxy to Herd
+function proxy_herd() {
+    project=$1
+    port=$2
+
+    if [ -z "$project" ]; then
+        project=$(basename "$PWD")
+    fi
+
+    if [ -z "$port" ]; then
+        port=8081
+    fi
+
+    eval "herd proxy $project http://127.0.0.1:$port"
+}
+
+# Create symbolic proxy to Herd
+function unproxy_herd() {
+    project=$1
+
+    if [ -z "$project" ]; then
+        project=$(basename "$PWD")
+    fi
+
+    eval "herd unproxy $project"
+}
+
+# Create new host at /etc/hosts
+function add_host() {
+    if [ $# -ne 2 ]; then
+        echo "Usaee: ah <ip_address> <hostname>"
+        return 1
+    fi
+
+    local ip=$1
+    local hostname=$2
+
+    if [ -n "$(grep $hostname /etc/hosts)" ]; then
+        echo "Hostname already exists in /etc/hosts"
+        return 1
+    fi
+
+    echo "$ip $hostname" | sudo tee -a /etc/hosts >/dev/null
+
+    if [ -n "$(grep $hostname /etc/hosts)" ]; then
+       echo "Entry added to /etc/hosts"
+    else
+       echo "Entry failed to be added at /etc/hosts"
+    fi
+}
+
+# function add_herd_aprova () {
+#     if [ "$#" -ne 1 ]; then
+#         echo "Usage: $0 domain.test"
+#         echo "Example: $0 example.test"
+#         return 1
+#     fi
+#
+#     DOMAIN="$1"
+#     NGINX_DIR="/Users/owrasor/Library/Application Support/Herd/config/valet/Nginx"
+#     NEW_CONFIG="$NGINX_DIR/$DOMAIN"
+#
+#     # Check if the config already exists
+#     if [ -f "$NEW_CONFIG" ]; then
+#         echo "Error: Configuration for $DOMAIN already exists"
+#         return 1
+#     fi
+#
+#     # Create the new configuration
+#     mkdir -p "$NGINX_DIR"
+#     cat <<EOF | sed "s/demo\.aprovafacil\.test/$DOMAIN/g" > "$NEW_CONFIG"
+# server {
+#     listen 127.0.0.1:80;
+#     server_name $DOMAIN www.$DOMAIN *.$DOMAIN;
+#     root /;
+#     charset utf-8;
+#     client_max_body_size 1024M;
+#
+#     location /41c270e4-5535-4daa-b23e-c269744c2f45/ {
+#         internal;
+#         alias /;
+#         try_files \$uri \$uri/;
+#     }
+#
+#     access_log off;
+#     error_log "/Users/owrasor/Library/Application Support/Herd/Log/$DOMAIN-error.log";
+#
+#     error_page 404 "";
+#
+#     location /vendor/horizon/ {
+#         root /var/www/html/aprovafacil-webserver/public;
+#         index index.php;
+#         try_files \$uri \$uri/ /index.php\$is_args$args;
+#     }
+#
+#     location /vendor/telescope/ {
+#         root /var/www/html/aprovafacil-webserver/public;
+#         index index.php;
+#         try_files \$uri \$uri/ /index.php\$is_args$args;
+#     }
+#
+#     location ~ ^/(api/v2/) {
+#         proxy_pass      http://127.0.0.1:3333;
+#         proxy_redirect off;
+#         proxy_http_version 1.1;
+#         proxy_set_header Host \$host;
+#         proxy_set_header X-Real-IP \$remote_addr;
+#         proxy_set_header Upgrade \$http_upgrade;
+#         proxy_set_header Connection "upgrade";
+#         proxy_set_header X-Forwarded-Proto \$scheme;
+#         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+#         proxy_cache_bypass \$http_upgrade;
+#     }
+#
+#     location ~ ^/(api/v1/|horizon|telescope|pulse|livewire) {
+#         root /var/www/html/aprovafacil-webserver/public;
+#         index index.php;
+#         try_files \$uri /index.php =404;
+#         fastcgi_pass php-upstream-81;
+#         fastcgi_index index.php;
+#         fastcgi_buffers 16 16k;
+#         fastcgi_buffer_size 32k;
+#         fastcgi_param SCRIPT_FILENAME \$document_root$fastcgi_script_name;
+#         fastcgi_read_timeout 600;
+#         include fastcgi_params;
+#     }
+#
+#     location / {
+#         proxy_pass http://127.0.0.1:8081;
+#         proxy_set_header   Host              \$host;
+#         proxy_set_header   X-Real-IP         \$remote_addr;
+#         proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+#         proxy_set_header   X-Forwarded-Proto \$scheme;
+#         proxy_set_header   X-Client-Verify   SUCCESS;
+#         proxy_set_header   X-Client-DN       \$ssl_client_s_dn;
+#         proxy_set_header   X-SSL-Subject     \$ssl_client_s_dn;
+#         proxy_set_header   X-SSL-Issuer      \$ssl_client_i_dn;
+#         proxy_set_header   X-NginX-Proxy true;
+#         proxy_set_header   Upgrade \$http_upgrade;
+#         proxy_set_header   Connection "upgrade";
+#         proxy_http_version 1.1;
+#         proxy_read_timeout 1800;
+#         proxy_connect_timeout 1800;
+#         chunked_transfer_encoding on;
+#         proxy_redirect off;
+#         proxy_buffering off;
+#     }
+#
+#     location ~ /\.ht {
+#         deny all;
+#     }
+# }
+#
+# server {
+#     listen 127.0.0.1:60;
+#     server_name $DOMAIN www.$DOMAIN *.$DOMAIN;
+#     root /;
+#     charset utf-8;
+#     client_max_body_size 1024M;
+#
+#     add_header X-Robots-Tag 'noindex, nofollow, nosnippet, noarchive';
+#
+#     location /41c270e4-5535-4daa-b23e-c269744c2f45/ {
+#         internal;
+#         alias /;
+#         try_files \$uri \$uri/;
+#     }
+#
+#     access_log off;
+#     error_log "/Users/owrasor/Library/Application Support/Herd/Log/$DOMAIN-error.log";
+#
+#     error_page 404 "";
+#
+#     location /vendor/horizon/ {
+#         root /var/www/html/aprovafacil-webserver/public;
+#         index index.php;
+#         try_files \$uri \$uri/ /index.php\$is_args$args;
+#     }
+#
+#     location /vendor/telescope/ {
+#         root /var/www/html/aprovafacil-webserver/public;
+#         index index.php;
+#         try_files \$uri \$uri/ /index.php\$is_args$args;
+#     }
+#
+#     location ~ ^/(api/v2/) {
+#         proxy_pass      http://127.0.0.1:3333;
+#         proxy_redirect off;
+#         proxy_http_version 1.1;
+#         proxy_set_header Host \$host;
+#         proxy_set_header X-Real-IP \$remote_addr;
+#         proxy_set_header Upgrade \$http_upgrade;
+#         proxy_set_header Connection "upgrade";
+#         proxy_set_header X-Forwarded-Proto \$scheme;
+#         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+#         proxy_cache_bypass \$http_upgrade;
+#     }
+#
+#     location ~ ^/(api/v1/|horizon|telescope|pulse|livewire) {
+#         root /var/www/html/aprovafacil-webserver/public;
+#         index index.php;
+#         try_files \$uri /index.php =404;
+#         fastcgi_pass php-upstream-81;
+#         fastcgi_index index.php;
+#         fastcgi_buffers 16 16k;
+#         fastcgi_buffer_size 32k;
+#         fastcgi_param SCRIPT_FILENAME \$document_root$fastcgi_script_name;
+#         fastcgi_read_timeout 600;
+#         include fastcgi_params;
+#     }
+#
+#     location / {
+#         proxy_pass http://127.0.0.1:8081;
+#         proxy_set_header   Host              \$host;
+#         proxy_set_header   X-Real-IP         \$remote_addr;
+#         proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+#         proxy_set_header   X-Forwarded-Proto \$scheme;
+#     }
+#
+#     location ~ /\.ht {
+#         deny all;
+#     }
+# }
+# EOF
+#
+#     chmod 644 "$NEW_CONFIG"
+#
+#     echo "Nginx configuration for $DOMAIN has been created at $NEW_CONFIG"
+#
+#     echo "Reiniciando Nginx via Herd..."
+#     herd restart nginx
+#     echo "Nginx restarted"
+# }
+
+# Create a new host at /etc/hosts for Aprovafacil Project
+function add_aprova_host() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: add_aprova_host <hostname>"
+        return 1
+    fi
+
+    local hostname="dev.webapp.$1.protofacil.ranp.com.br"
+    local ip="127.0.0.1"  # Assuming you want to add a localhost entry
+
+    eval "add_host '$ip' '$hostname'"
+}
+
+function remove_host() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: remove_host <hostname>"
+        return 1
+    fi
+
+    local hostname=$1
+
+    if [ -n "$(grep $hostname /etc/hosts)" ]; then
+        sudo grep -vE "\\b$hostname\\b" /etc/hosts | sudo tee /etc/hosts.tmp >/dev/null
+        sudo mv /etc/hosts.tmp /etc/hosts
+        if [ -n "$(grep $hostname /etc/hosts)" ]; then
+            echo "Entry for $hostname failed to be from /etc/hosts"
+        else
+            echo "Entry for $hostname removed from /etc/hosts"
+         fi
+    else
+        echo "Hostname $hostname does not exists to be removed"
+    fi
+}
+
+function remove_aprova_host() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: remove_aprova_host <hostname>"
+        return 1
+    fi
+
+    local hostname="dev.webapp.$1.protofacil.ranp.com.br"
+
+    eval "remove_host '$hostname'"
+}
+
+function restore_aprova_db() {
+    local local_exec=0
+
+    if [[ $1 == "-wd" ]]; then
+        local_exec=1
+        shift
+    fi
+
+    echo $#
+
+    if [ $# -ne 2 ]; then
+        echo "Usage: restore_aprova_db <database> <file_location>"
+        return 1
+    fi
+
+    local database=$1
+    local file_location=$2
+
+    echo "Starting database restore for: $database"
+    echo "File location: $file_location"
+
+    if [ $local_exec -eq 1 ]; then
+        echo "Executing locally..."
+        
+        # Verifica se o banco existe
+        if psql -U homestead -d postgres -lqt | cut -d \| -f 1 | grep -qw "$database"; then
+            echo "Database $database exists. Terminating connections..."
+            psql -U homestead -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$database' AND pid <> pg_backend_pid();"
+            
+            echo "Dropping database $database..."
+            if dropdb -U homestead "$database"; then
+                echo "Database $database dropped successfully."
+            else
+                echo "Error: Failed to drop database $database"
+                return 1
+            fi
+        else
+            echo "Database $database does not exist."
+        fi
+        
+        echo "Creating database $database..."
+        if createdb -U homestead "$database"; then
+            echo "Database $database created successfully."
+        else
+            echo "Error: Failed to create database $database"
+            return 1
+        fi
+        
+        echo "Restoring data to $database..."
+        if psql -U homestead -d "$database" < "$file_location"; then
+            echo "Database restore completed successfully!"
+        else
+            echo "Error: Failed to restore data to database $database"
+            return 1
+        fi
+    else
+        echo "Executing via Docker..."
+        
+        # Verifica se o banco existe
+        if eval "dc exec -T postgres psql -U homestead -d postgres -lqt | cut -d \\| -f 1 | grep -qw $database"; then
+            echo "Database $database exists. Terminating connections..."
+            eval "dc exec -T postgres psql -U homestead -d postgres -c \"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$database' AND pid <> pg_backend_pid();\""
+            
+            echo "Dropping database $database..."
+            if eval "dc exec -T postgres dropdb -U homestead $database"; then
+                echo "Database $database dropped successfully."
+            else
+                echo "Error: Failed to drop database $database"
+                return 1
+            fi
+        else
+            echo "Database $database does not exist."
+        fi
+        
+        echo "Creating database $database..."
+        if eval "dc exec -T postgres createdb -U homestead $database"; then
+            echo "Database $database created successfully."
+        else
+            echo "Error: Failed to create database $database"
+            return 1
+        fi
+        
+        echo "Restoring data to $database..."
+        if eval "dc exec -T postgres psql -U homestead -d $database < $file_location"; then
+            echo "Database restore completed successfully!"
+        else
+            echo "Error: Failed to restore data to database $database"
+            return 1
+        fi
+    fi
+}
+
+#--------------------------------------------------------------------------
+# Laravel artisan plugin for zsh
+#--------------------------------------------------------------------------
+#
+# This plugin adds an `artisan` shell command that will find and execute
+# Laravel's artisan command from anywhere within the project. It also
+# adds shell completions that work anywhere artisan can be located.
+
+function artisan() {
+    local artisan_path=`_artisan_find`
+
+    if [ "$artisan_path" = "" ]; then
+        >&2 echo "zsh-artisan: artisan not found. Are you in a Laravel directory?"
+        return 1
+    fi
+
+    local laravel_path=`dirname $artisan_path`
+    local docker_compose_config_path=`find $laravel_path -maxdepth 1 \( -name "docker-compose.yml" -o -name "docker-compose.yaml" \) | head -n1`
+    local artisan_cmd
+
+    artisan_cmd="php $artisan_path"
+
+    if [ "$docker_compose_config_path" != '' ]; then
+        if [ "`grep -i "image: sail-.*/app.*$" $docker_compose_config_path | grep -v "#.*image: sail-.*/app.*$" | head -n1`" != '' ]; then
+            artisan_cmd="$laravel_path/vendor/bin/sail artisan"
+        else
+            local docker_compose_service_name=`docker-compose ps --services 2>/dev/null | grep 'app\|php\|api\|workspace\|laravel\.test\|webhost' | head -n1`
+            if [ "$docker_compose_service_name" != '' ]; then
+                if [ -t 1 ]; then
+                    artisan_cmd="docker-compose exec $docker_compose_service_name php artisan"
+                else
+                    # The command is not being run in a TTY (e.g. it's being called by the completion handler below)
+                    artisan_cmd="docker-compose exec -T $docker_compose_service_name php artisan"
+                fi
+            fi
+        fi
+    fi
+
+    local artisan_subcmd=$1
+    shift
+
+    local artisan_args=()
+    local arg
+    for arg in $@
+    do
+        artisan_args+=($(printf "%s" "$arg" | sed "s/'/'\\\\''/g;1s/^/'/;\$s/\$/'/"))
+    done
+
+    local artisan_start_time=`date +%s`
+
+    eval $artisan_cmd $artisan_subcmd $artisan_args
+
+    local artisan_exit_status=$? # Store the exit status so we can return it later
+
+    if [[ $1 = "make:"* && $ARTISAN_OPEN_ON_MAKE_EDITOR != "" ]]; then
+        # Find and open files created by artisan
+        find \
+            "$laravel_path/app" \
+            "$laravel_path/tests" \
+            "$laravel_path/database" \
+            -type f \
+            -newermt "-$((`date +%s` - $artisan_start_time + 1)) seconds" \
+            -exec $ARTISAN_OPEN_ON_MAKE_EDITOR {} \; 2>/dev/null
+    fi
+
+    return $artisan_exit_status
+}
+
+# compdef _artisan_add_completion artisan
+
+function _artisan_find() {
+    # Look for artisan up the file tree until the root directory
+    local dir=.
+    until [ $dir -ef / ]; do
+        if [ -f "$dir/artisan" ]; then
+            echo "$dir/artisan"
+            return 0
+        fi
+
+        dir+=/..
+    done
+
+    return 1
+}
+
+function _artisan_add_completion() {
+    if [ "`_artisan_find`" != "" ]; then
+        compadd `_artisan_get_command_list`
+    fi
+}
+
+function _artisan_get_command_list() {
+    artisan --raw --no-ansi list | sed "s/[[:space:]].*//g"
+}
+
+function _docker_compose_cmd() {
+    docker compose &> /dev/null
+    if [ $? = 0 ]; then
+        echo "docker compose"
+    else
+        echo "docker-compose"
+    fi
+}
+
+function _t() {
+  {
+    exec </dev/tty
+    exec <&1
+    local session
+    session=$(sesh list -t -c | fzf --height 40% --reverse --border-label ' sesh ' --border --prompt '⚡  ')
+    [[ -z "$session" ]] && return
+    sesh connect $session
+  }
+}
 
 open () {
     xdg-open $* > /dev/null 2>&1
@@ -142,6 +683,11 @@ zinit light zdharma/fast-syntax-highlighting
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-completions
 
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# opencode
+export PATH=/home/owrasor/.opencode/bin:$PATH

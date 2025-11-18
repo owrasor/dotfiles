@@ -1,54 +1,41 @@
 local wezterm = require("wezterm")
-local constants = require("constants")
-local colorschemes = require("colorschemes")
+local config = wezterm.config_builder()
+local mux = wezterm.mux
 
-local config = {}
-if wezterm.config_builder then
-	config = wezterm.config_builder()
-end
+config.font_size = 12
+config.line_height = 1.0
+-- config.font = wezterm.font("MesloLGS NF Bold")
+config.font = wezterm.font("FiraCode Nerd Font")
+config.color_scheme = "tokyonight_night"
 
-config.color_schemes = colorschemes.color_schemes
-config.color_scheme = colorschemes.color_scheme
+config.colors = {
+    cursor_bg = "#7aa2f7",
+    cursor_border = "7aa2f7",
+}
 
-config.default_cursor_style = "SteadyBar"
-config.automatically_reload_config = true
-config.window_close_confirmation = "NeverPrompt"
-config.adjust_window_size_when_changing_font_size = false
 config.window_decorations = "RESIZE"
-config.use_fancy_tab_bar = false
-config.tab_bar_at_bottom = false
-config.font_size = 16
-config.prefer_egl = true
-config.max_fps = 120
-config.font = wezterm.font("JetBrains Mono", { weight = "Bold" })
 config.enable_tab_bar = false
 config.window_padding = {
-	left = "0px",
-	right = "0px",
-	top = "0px",
-	bottom = "0px",
+    left = 10,
+    right = 2,
+    top = 2,
+    bottom = 2,
 }
 
-config.window_background_image = constants.image_black
-config.window_background_opacity = 1
-config.macos_window_background_blur = 40
+wezterm.on('gui-startup', function(cmd)
+    local tab, pane, window = mux.spawn_window(cmd or {})
+    window:gui_window():maximize()
+end)
 
-config.window_background_image_hsb = {
-	-- Darken the background image by reducing it to 1/3rd
-	brightness = 0.02,
-
-	-- You can adjust the hue by scaling its value.
-	-- a multiplier of 1.0 leaves the value unchanged.
-	hue = 1.0,
-
-	-- You can adjust the saturation also.
-	saturation = 1.0,
+config.keys = {
+    {
+        key = "n",
+        mods = "SHIFT|CTRL",
+        action = wezterm.action.ToggleFullScreen,
+    },
 }
 
-config.foreground_text_hsb = {
-	hue = 1.0,
-	saturation = 1.0,
-	brightness = 1.0,
-}
+-- config.default_domain = "WSL:Ubuntu"
+-- config.default_prog = { "wsl.exe", "-d", "Ubuntu" }
 
-return config -- Pull in the wezterm API
+return config
