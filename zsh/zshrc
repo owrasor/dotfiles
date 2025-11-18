@@ -1,5 +1,12 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
+# ZSH_THEME="powerlevel10k/powerlevel10k"
 HYPHEN_INSENSITIVE="true"
 COMPLETION_WAITING_DOTS="true"
 HIST_STAMPS="mm/dd/yyyy"
@@ -640,6 +647,119 @@ composer-link() {
     composer config repositories.local '{"type": "path", "url": "'$1'"}' --file composer.json
 }
 
+# Restore a PostgreSQL database dump using standard psql credentials
+restore_db() {
+    local use_docker=0
+    local container_name="postgres"
+
+    if [[ "$1" == "-wd" ]]; then
+        use_docker=1
+        shift
+    fi
+
+    if [[ $# -ne 2 ]]; then
+        echo "Usage: restore_pg [-wd] <database> <dump_path>"
+        return 1
+    fi
+
+    if (( ! use_docker )) && ! command -v psql >/dev/null 2>&1; then
+        echo "psql command not found"
+        return 1
+    fi
+
+    local db_name="$1"
+    local dump_path="$2"
+
+    if [[ ! -f "$dump_path" ]]; then
+        echo "Dump file not found: $dump_path"
+        return 1
+    fi
+
+    local -a psql_cmd
+    local -a psql_restore_cmd
+
+    if (( use_docker )); then
+        if ! command -v docker >/dev/null 2>&1; then
+            echo "docker command not found"
+            return 1
+        fi
+
+        local resolved_container="$container_name"
+
+        if ! docker ps --format '{{.Names}}' | grep -Fx "$resolved_container" >/dev/null 2>&1; then
+            resolved_container="$(docker ps --filter "label=com.docker.compose.service=${container_name}" --format '{{.Names}}' | head -n 1)"
+
+            if [[ -z "$resolved_container" ]]; then
+                resolved_container="$(docker ps --filter "name=${container_name}" --format '{{.Names}}' | head -n 1)"
+            fi
+
+            if [[ -z "$resolved_container" ]]; then
+                resolved_container="$(docker ps --filter "ancestor=${container_name}" --format '{{.Names}}' | head -n 1)"
+            fi
+
+            if [[ -z "$resolved_container" && "$container_name" != "postgres" ]]; then
+                resolved_container="$(docker ps --filter "ancestor=postgres" --format '{{.Names}}' | head -n 1)"
+            fi
+
+            if [[ -z "$resolved_container" ]]; then
+                echo "Running container not found matching identifier: $container_name"
+                return 1
+            fi
+        fi
+
+        resolved_container="${resolved_container//$'\n'/}"
+
+        psql_cmd=(docker exec -i "$resolved_container" env PGPASSWORD="secret" psql --username=homestead --set=ON_ERROR_STOP=on)
+        psql_restore_cmd=(docker exec -i "$resolved_container" env PGPASSWORD="secret" psql --username=homestead --set=ON_ERROR_STOP=off)
+    else
+        psql_cmd=(env PGPASSWORD="secret" psql --username=homestead --set=ON_ERROR_STOP=on)
+        psql_restore_cmd=(env PGPASSWORD="secret" psql --username=homestead --set=ON_ERROR_STOP=off)
+    fi
+
+    local admin_db="postgres"
+    local escaped_db_literal="${db_name//\'/''}"
+    local escaped_db_identifier="${db_name//\"/\"\"}"
+    local db_exists_output
+
+    if ! db_exists_output="$("${psql_cmd[@]}" --dbname="$admin_db" --tuples-only --no-align --command "SELECT 1 FROM pg_database WHERE datname = '${escaped_db_literal}'")"; then
+        echo "Failed to verify database existence: $db_name"
+        return 1
+    fi
+
+    local db_exists="${db_exists_output//$'\n'/}"
+
+    if [[ "$db_exists" == "1" ]]; then
+        local terminate_query="SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${escaped_db_literal}' AND pid <> pg_backend_pid();"
+
+        if ! "${psql_cmd[@]}" --dbname="$admin_db" --command "$terminate_query"; then
+            echo "Failed to terminate active sessions for database: $db_name"
+            return 1
+        fi
+
+        if ! "${psql_cmd[@]}" --dbname="$admin_db" --command "DROP DATABASE \"${escaped_db_identifier}\";"; then
+            echo "Failed to drop existing database: $db_name"
+            return 1
+        fi
+    fi
+
+    if ! "${psql_cmd[@]}" --dbname="$admin_db" --command "CREATE DATABASE \"${escaped_db_identifier}\";"; then
+        echo "Failed to create database: $db_name"
+        return 1
+    fi
+
+    if (( use_docker )); then
+        if ! "${psql_restore_cmd[@]}" --dbname="$db_name" < "$dump_path"; then
+            echo "Restore failed inside container ${resolved_container:-$container_name}"
+            return 1
+        fi
+    else
+        if ! "${psql_restore_cmd[@]}" --dbname="$db_name" --file="$dump_path"; then
+            echo "Restore failed for database $db_name"
+            return 1
+        fi
+    fi
+}
+
 #--------------------------------------------------------------------------
 # Miscellaneous
 #--------------------------------------------------------------------------
@@ -691,3 +811,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # opencode
 export PATH=/home/owrasor/.opencode/bin:$PATH
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+source ~/powerlevel10k/powerlevel10k.zsh-theme
