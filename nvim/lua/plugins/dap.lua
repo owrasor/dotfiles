@@ -48,7 +48,7 @@ return {
 			dap.adapters.php = {
 				type = "executable",
 				command = "node",
-				args = { "/Users/owrasor/Code/xdebug/out/phpDebug.js" },
+				args = { "/home/owrasor/Code/owrasor/xdebug/out/phpDebug.js" },
 			}
 
 			dap.configurations.php = {
