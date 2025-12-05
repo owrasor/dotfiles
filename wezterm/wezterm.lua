@@ -2,7 +2,7 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local mux = wezterm.mux
 
-config.font_size = 18
+config.font_size = 14
 config.line_height = 1.0
 -- config.font = wezterm.font("MesloLGS NF Bold")
 config.font = wezterm.font("FiraCode Nerd Font")

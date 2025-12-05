@@ -55,3 +55,4 @@ vim.keymap.set(
 	[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
 	{ desc = "Replace word under cursor" }
 )
+vim.keymap.set("n", "<leader>w", "<CMD>:w<CR>", { desc = "Save current buffer" })
