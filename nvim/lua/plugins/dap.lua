@@ -10,6 +10,7 @@ return {
 		config = function()
 			local dap = require("dap")
 			local ui = require("dapui")
+			local utils = require("dap.utils")
 
 			require("dapui").setup()
 			require("nvim-dap-virtual-text").setup({})
@@ -62,6 +63,26 @@ return {
 					},
 				},
 			}
+
+			-- dap.adapters.pwa_node = {
+			-- 	type = "server",
+			-- 	port = "${port}",
+			-- 	executable = {
+			-- 		command = "js-debug-adapter",
+			-- 		args = { "${port}" },
+			-- 	},
+			-- }
+			--
+			-- dap.configurations["typescript"] = {
+			-- 	{
+			-- 		type = "node",
+			-- 		request = "launch",
+			-- 		name = "Dev server",
+			-- 		program = "${workspaceFolder}/ace.js",
+			-- 		-- args = ["serve", "--hmr"],
+			-- 		-- skipFiles = ["<node_internals>/**"]
+			-- 	},
+			-- }
 
 			vim.keymap.set("n", "<leader>bb", dap.toggle_breakpoint)
 			vim.keymap.set("n", "<leader>gb", dap.run_to_cursor)
