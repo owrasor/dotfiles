@@ -394,7 +394,7 @@ function add_aprova_host() {
         return 1
     fi
 
-    local hostname="dev.webapp.$1.protofacil.ranp.com.br"
+    local hostname="$1.aprovafacil.test"
     local ip="127.0.0.1"  # Assuming you want to add a localhost entry
 
     eval "add_host '$ip' '$hostname'"
@@ -427,42 +427,84 @@ function remove_aprova_host() {
         return 1
     fi
 
-    local hostname="dev.webapp.$1.protofacil.ranp.com.br"
+    local hostname="$1.aprovafacil.test"
 
     eval "remove_host '$hostname'"
 }
 
 function restore_aprova_db() {
     local local_exec=0
+    local convert_encoding=0
 
-    if [[ $1 == "-wd" ]]; then
-        local_exec=1
+    while [[ $1 == -* ]]; do
+        case $1 in
+            -wd) local_exec=1 ;;
+            -c)  convert_encoding=1 ;;
+            *)   echo "Unknown option: $1"; return 1 ;;
+        esac
         shift
-    fi
+    done
 
-    echo $#
-
-    if [ $# -ne 2 ]; then
-        echo "Usage: restore_aprova_db <database> <file_location>"
+    if [ $# -lt 2 ]; then
+        echo "Usage: restore_aprova_db [-wd] [-c] <database> <file_location> [user] [host] [port]"
+        echo "  -wd: Execute locally (default: Docker)"
+        echo "  -c:  Convert dump from UTF8 to LATIN1"
         return 1
     fi
 
     local database=$1
     local file_location=$2
+    local db_user=${3:-homestead}
+    local db_host=$4
+    local db_port=$5
+
+    local host_arg=""
+    if [ -n "$db_host" ]; then
+        host_arg="-h $db_host"
+    fi
+
+    local port_arg=""
+    if [ -n "$db_port" ]; then
+        port_arg="-p $db_port"
+    fi
+
+    # Prompt for password once if not set
+    local PGPASSWORD=$PGPASSWORD
+    if [[ -z "$PGPASSWORD" ]]; then
+        echo -n "Database password for $db_user: "
+        read -rs PGPASSWORD
+        echo
+    fi
+    export PGPASSWORD
 
     echo "Starting database restore for: $database"
     echo "File location: $file_location"
+    echo "User: $db_user"
+    [ -n "$db_host" ] && echo "Host: $db_host"
+    [ -n "$db_port" ] && echo "Port: $db_port"
+    [ $convert_encoding -eq 1 ] && echo "Encoding conversion: UTF-8 -> LATIN1"
+
+    # Encoding configuration
+    local encoding_filter="cat \"$file_location\""
+    if [ $convert_encoding -eq 1 ]; then
+        encoding_filter="$encoding_filter | iconv -f UTF-8 -t LATIN1//TRANSLIT"
+        export PGCLIENTENCODING=LATIN1
+    else
+        export PGCLIENTENCODING=UTF8
+    fi
+
+    local common_filter="sed -E '/^ALTER.*OWNER TO/d; /^GRANT/d; /^REVOKE/d'"
 
     if [ $local_exec -eq 1 ]; then
         echo "Executing locally..."
         
         # Verifica se o banco existe
-        if psql -U homestead -d postgres -lqt | cut -d \| -f 1 | grep -qw "$database"; then
+        if psql -U "$db_user" $host_arg $port_arg -d postgres -lqt | cut -d \| -f 1 | grep -qw "$database"; then
             echo "Database $database exists. Terminating connections..."
-            psql -U homestead -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$database' AND pid <> pg_backend_pid();"
+            psql -U "$db_user" $host_arg $port_arg -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$database' AND pid <> pg_backend_pid();"
             
             echo "Dropping database $database..."
-            if dropdb -U homestead "$database"; then
+            if dropdb -U "$db_user" $host_arg $port_arg "$database"; then
                 echo "Database $database dropped successfully."
             else
                 echo "Error: Failed to drop database $database"
@@ -473,7 +515,7 @@ function restore_aprova_db() {
         fi
         
         echo "Creating database $database..."
-        if createdb -U homestead "$database"; then
+        if createdb -U "$db_user" $host_arg $port_arg "$database"; then
             echo "Database $database created successfully."
         else
             echo "Error: Failed to create database $database"
@@ -481,7 +523,7 @@ function restore_aprova_db() {
         fi
         
         echo "Restoring data to $database..."
-        if psql -U homestead -d "$database" < "$file_location"; then
+        if eval "$encoding_filter | $common_filter | psql -U \"$db_user\" $host_arg $port_arg -d \"$database\""; then
             echo "Database restore completed successfully!"
         else
             echo "Error: Failed to restore data to database $database"
@@ -490,13 +532,18 @@ function restore_aprova_db() {
     else
         echo "Executing via Docker..."
         
+        # Helper function to run commands with PGPASSWORD inside docker
+        function dc_psql() {
+            eval "dc exec -T -e PGPASSWORD=\"$PGPASSWORD\" -e PGCLIENTENCODING=\"$PGCLIENTENCODING\" postgres $@"
+        }
+
         # Verifica se o banco existe
-        if eval "dc exec -T postgres psql -U homestead -d postgres -lqt | cut -d \\| -f 1 | grep -qw $database"; then
+        if dc_psql psql -U $db_user $host_arg $port_arg -d postgres -lqt | cut -d \| -f 1 | grep -qw $database; then
             echo "Database $database exists. Terminating connections..."
-            eval "dc exec -T postgres psql -U homestead -d postgres -c \"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$database' AND pid <> pg_backend_pid();\""
+            dc_psql psql -U $db_user $host_arg $port_arg -d postgres -c "\"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$database' AND pid <> pg_backend_pid();\""
             
             echo "Dropping database $database..."
-            if eval "dc exec -T postgres dropdb -U homestead $database"; then
+            if dc_psql dropdb -U $db_user $host_arg $port_arg $database; then
                 echo "Database $database dropped successfully."
             else
                 echo "Error: Failed to drop database $database"
@@ -507,7 +554,7 @@ function restore_aprova_db() {
         fi
         
         echo "Creating database $database..."
-        if eval "dc exec -T postgres createdb -U homestead $database"; then
+        if dc_psql createdb -U $db_user $host_arg $port_arg $database; then
             echo "Database $database created successfully."
         else
             echo "Error: Failed to create database $database"
@@ -515,7 +562,7 @@ function restore_aprova_db() {
         fi
         
         echo "Restoring data to $database..."
-        if eval "dc exec -T postgres psql -U homestead -d $database < $file_location"; then
+        if eval "$encoding_filter | $common_filter | dc exec -T -e PGPASSWORD=\"$PGPASSWORD\" -e PGCLIENTENCODING=\"$PGCLIENTENCODING\" postgres psql -U $db_user $host_arg $port_arg -d $database"; then
             echo "Database restore completed successfully!"
         else
             echo "Error: Failed to restore data to database $database"
@@ -803,7 +850,7 @@ zinit light zdharma/fast-syntax-highlighting
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-completions
 
-export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin:/usr/local/go/bin"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -811,6 +858,8 @@ export NVM_DIR="$HOME/.nvm"
 
 # opencode
 export PATH=/home/owrasor/.opencode/bin:$PATH
+
+export PATH="${ASDF_DATA_DIR:-$HOME/Apps/asdf}/bin:$PATH"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
