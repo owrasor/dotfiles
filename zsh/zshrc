@@ -865,7 +865,6 @@ export PATH="${ASDF_DATA_DIR:-$HOME/Apps/asdf}/bin:$PATH"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 
-# Tmuxinator Auto-start
-if [[ -z "$TMUX" && -n "$PS1" ]]; then
-    tmuxinator start aprovafacil
-fi
+# opencode
+export PATH=/home/owras_picyvzc/.opencode/bin:$PATH
+export PATH="$PATH:$HOME/flutter/bin"
