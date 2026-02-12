@@ -864,3 +864,8 @@ export PATH="${ASDF_DATA_DIR:-$HOME/Apps/asdf}/bin:$PATH"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 source ~/powerlevel10k/powerlevel10k.zsh-theme
+
+# Tmuxinator Auto-start
+if [[ -z "$TMUX" && -n "$PS1" ]]; then
+    tmuxinator start aprovafacil
+fi
