@@ -64,6 +64,8 @@ return {
 					"graphql",
 					"emmet_ls",
 					"prismals",
+					"intelephense",
+					"laravel_ls",
 					-- "pyright",
 				},
 			})
@@ -77,6 +79,7 @@ return {
 					-- "pylint",
 					"eslint_d",
 					"pint",
+					"php-debug-adapter",
 				},
 			})
 		end,
