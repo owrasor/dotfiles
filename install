@@ -2,55 +2,95 @@
 
 DOTFILES=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
-PKG_OK=$(dpkg-query -W --showformat='${Status}\n' zsh | grep "install ok installed")
-echo "Checking for zsh: $PKG_OK"
-if [ "" = "$PKG_OK" ]; then
-    echo "No zsh. Setting up zsh."
-    sudo apt-get --yes install zsh
-fi
-
-DIR="$HOME/.oh-my-zsh"
-if [ ! -d "$DIR" ]; then
-    echo "Checking for oh-my-zsh: not installed"
-    PKG_CURL_OK=$(dpkg-query -W --showformat='${Status}\n' curl | grep "install ok installed")
-    echo "Checking for curl: $PKG_CURL_OK"
-    if [ "" = "$PKG_CURL_OK" ]; then
-        echo "No curl. Setting up curl."
-        sudo apt-get --yes install curl
+# Function to install packages across different distributions
+install_pkg() {
+    local pkg=$1
+    if command -v "$pkg" >/dev/null 2>&1; then
+        echo "Checking for $pkg: installed"
+        return 0
     fi
 
+    echo "No $pkg. Setting up $pkg."
+    if command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get update && sudo apt-get --yes install "$pkg"
+    elif command -v dnf >/dev/null 2>&1; then
+        sudo dnf install -y "$pkg"
+    elif command -v pacman >/dev/null 2>&1; then
+        sudo pacman -S --noconfirm "$pkg"
+    elif command -v zypper >/dev/null 2>&1; then
+        sudo zypper install -y "$pkg"
+    else
+        echo "Error: No supported package manager found. Please install $pkg manually."
+        return 1
+    fi
+}
+
+# Ensure dependencies are installed
+install_pkg zsh
+install_pkg curl
+install_pkg git
+install_pkg tmux
+
+# Oh My Zsh installation
+DIR="$HOME/.oh-my-zsh"
+if [ ! -d "$DIR" ]; then
     echo "No oh-my-zsh. Setting up oh-my-zsh"
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 else
     echo "Checking for oh-my-zsh: installed"
 fi
 
+# Zsh-artisan plugin
 DIR="$HOME/.oh-my-zsh/custom/plugins/artisan"
 if [ ! -d "$DIR" ]; then
-    echo "Checking for zsh-artisan plugin: not installed"
-    PKG_CURL_OK=$(dpkg-query -W --showformat='${Status}\n' curl | grep "install ok installed")
-    echo "Checking for curl: $PKG_CURL_OK"
-    if [ "" = "$PKG_CURL_OK" ]; then
-        echo "No curl. Setting up curl."
-        sudo apt-get --yes install curl
-    fi
-
     echo "No zsh-artisan plugin. Setting up zsh-artisan"
-    git clone https://github.com/owrasor/zsh-artisan.git ~/.oh-my-zsh/custom/plugins/artisan
+    git clone https://github.com/owrasor/zsh-artisan.git "$DIR"
 else
     echo "Checking for zsh-artisan plugin: installed"
 fi
 
-rm -rf $HOME/.zshrc
-ln -s $DOTFILES/zsh/zshrc $HOME/.zshrc
+# Powerlevel10k theme
+DIR="$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
+if [ ! -d "$DIR" ]; then
+    echo "No powerlevel10k. Setting up powerlevel10k"
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$DIR"
+else
+    echo "Checking for powerlevel10k: installed"
+fi
 
-# rm -rf $HOME/.tmux.conf
-# ln -s $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
+# Link configuration files
+echo "Linking configuration files..."
+ln -sf "$DOTFILES/zsh/zshrc" "$HOME/.zshrc"
+ln -sf "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
 
-# mkdir -p $HOME/.local/bin
+# Ensure local bin exists and link custom scripts
+mkdir -p "$HOME/.local/bin"
+if [ -f "$DOTFILES/scripts/t" ]; then
+    ln -sf "$DOTFILES/scripts/t" "$HOME/.local/bin/t"
+fi
 
-# rm -rf $HOME/.local/bin/t
-# ln -s $DOTFILES/scripts/t $HOME/.local/bin/t
+# Link Neovim configuration
+if [ -d "$DOTFILES/nvim" ]; then
+    mkdir -p "$HOME/.config"
+    ln -sfn "$DOTFILES/nvim" "$HOME/.config/nvim"
+fi
 
-# rm -rf $HOME/.config/nvim
-# ln -s $DOTFILES/nvim $HOME/.config/nvim
+# Set Zsh as default shell
+if [ "$SHELL" != "$(which zsh)" ]; then
+    echo "Setting Zsh as the default shell..."
+    sudo chsh -s "$(which zsh)" "$USER"
+fi
+
+# Add auto-transition to Zsh in .bashrc if not already there
+if ! grep -q "exec zsh" "$HOME/.bashrc"; then
+    echo "Adding auto-transition to Zsh in .bashrc for immediate effect..."
+    cat <<'EOF' >> "$HOME/.bashrc"
+
+# Auto-transition to Zsh
+if [[ -t 1 ]] && command -v zsh >/dev/null 2>&1; then
+    exec zsh
+fi
+EOF
+fi
+
+echo "Installation and linking complete! Please restart your terminal or run 'zsh' to start."
