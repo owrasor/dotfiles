@@ -19,17 +19,17 @@ vim.keymap.set("n", "<leader>cp", ':let @* = expand("%")<cr>', { desc = "Copy pa
 
 -- TODO keymaps
 vim.keymap.set("n", "]t", function()
-	require("todo-comments").jump_next()
+    require("todo-comments").jump_next()
 end, { desc = "Next todo comment" })
 
 vim.keymap.set("n", "[t", function()
-	require("todo-comments").jump_prev()
+    require("todo-comments").jump_prev()
 end, { desc = "Previous todo comment" })
 
 -- You can also specify a list of valid jump keywords
 
 vim.keymap.set("n", "]t", function()
-	require("todo-comments").jump_next({ keywords = { "ERROR", "WARNING" } })
+    require("todo-comments").jump_next({ keywords = { "ERROR", "WARNING" } })
 end, { desc = "Next error/warning todo comment" })
 
 vim.keymap.set("n", "<C-e>", "<CMD>Oil<CR>", { desc = "Open parent directory" })
@@ -38,22 +38,22 @@ vim.keymap.set("n", "<C-e>", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 vim.keymap.set("n", "<C-i>", "<CMD>DBUIToggle<CR>", { desc = "Open database" })
 
 local function toggle_diffview()
-	local view = require("diffview.lib").get_current_view()
-	if view then
-		vim.cmd("DiffviewClose")
-	else
-		vim.cmd("DiffviewOpen")
-	end
+    local view = require("diffview.lib").get_current_view()
+    if view then
+        vim.cmd("DiffviewClose")
+    else
+        vim.cmd("DiffviewOpen")
+    end
 end
 
 -- Mapeie o atalho, por exemplo <leader>d
 vim.keymap.set("n", "<leader>df", toggle_diffview, { desc = "Toggle Diffview" })
 
 vim.keymap.set(
-	"n",
-	"<leader>fr",
-	[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
-	{ desc = "Replace word under cursor" }
+    "n",
+    "<leader>fr",
+    [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+    { desc = "Replace word under cursor" }
 )
 
-vim.keymap.set("n", "<leader>w", ":write<CR>", { desc = "Save file" })
+vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "Save file" })

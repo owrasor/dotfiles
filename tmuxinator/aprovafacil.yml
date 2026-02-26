@@ -1,0 +1,38 @@
+name: aprovafacil
+root: ~/Code/aprovafacil
+
+windows:
+  - webserver:
+      root: ~/Code/aprovafacil/aprovafacil-webserver
+      layout: main-horizontal
+      panes:
+        - sleep 1 && tmux resize-pane -Z -t aprovafacil:webserver.1 && nvim
+        -  # Empty zsh
+        -  # Empty zsh
+  - webapp:
+      root: ~/Code/aprovafacil/aprovafacil-webapp
+      layout: main-horizontal
+      panes:
+        - sleep 1 && tmux resize-pane -Z -t aprovafacil:webapp.1 && nvim
+        -  # Empty zsh
+        -  # Empty zsh
+  - serverjs:
+      root: ~/Code/aprovafacil/aprovafacil-serverjs
+      layout: main-horizontal
+      panes:
+        - sleep 1 && tmux resize-pane -Z -t aprovafacil:serverjs.1 && nvim
+        -  # Empty zsh
+  - infra:
+      root: ~/Code/aprovafacil/aprovafacil-infra-dev
+      layout: even-vertical
+      panes:
+        -  # Empty zsh
+        -  # Empty zsh
+  - pm2:
+      root: ~
+      panes:
+        - pm2 logs
+  - AI:
+      root: ~/Code/aprovafacil
+      panes:
+        - opencode
