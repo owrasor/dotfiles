@@ -142,6 +142,12 @@ if [ ! -f "$HOME/intelephense/license.txt" ]; then
     touch "$HOME/intelephense/license.txt"
 fi
 
+# Set Zsh as default shell
+if [ "$SHELL" != "$(which zsh)" ]; then
+    echo "Setting Zsh as the default shell..."
+    sudo chsh -s "$(which zsh)" "$USER"
+fi
+
 # Opencode installation
 if ! command -v opencode >/dev/null 2>&1; then
     echo "Installing Opencode..."
@@ -169,12 +175,6 @@ else
     else
         echo "Checking for Opencode Gemini OAuth plugin: configured"
     fi
-fi
-
-# Set Zsh as default shell
-if [ "$SHELL" != "$(which zsh)" ]; then
-    echo "Setting Zsh as the default shell..."
-    sudo chsh -s "$(which zsh)" "$USER"
 fi
 
 # Add auto-transition to Zsh in .bashrc if not already there
