@@ -40,6 +40,19 @@ opt.scrolloff = 8
 opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
 
 -- clipboard
+if vim.fn.exists('$SSH_CONNECTION') == 1 or vim.fn.exists('$SSH_CLIENT') == 1 then
+    vim.g.clipboard = {
+        name = 'OSC 52',
+        copy = {
+            ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+            ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+        },
+        paste = {
+            ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+            ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+        },
+    }
+end
 opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
 -- split windows

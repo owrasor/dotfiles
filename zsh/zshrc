@@ -817,6 +817,17 @@ restore_db() {
 # Miscellaneous
 #--------------------------------------------------------------------------
 
+# Copy to clipboard via OSC 52 (works over SSH)
+function pbcopy() {
+    local buffer
+    if [ -t 0 ]; then
+        buffer="$*"
+    else
+        buffer=$(cat)
+    fi
+    printf "\e]52;c;$(printf "%s" "$buffer" | base64 | tr -d '\n')\a"
+}
+
 ### Fix slowness of pastes with zsh-syntax-highlighting.zsh
 pasteinit() {
   OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}

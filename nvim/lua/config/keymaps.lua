@@ -9,6 +9,7 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 -- http://ddrscott.github.io/blog/2016/yank-without-jank/
 vim.keymap.set("v", "y", "myy`y")
 vim.keymap.set("v", "Y", "myY`y")
+vim.keymap.set("n", "Y", "yg$", { desc = "Yank to end of line to system clipboard" })
 
 -- Paste replace visual selection without copying it.
 vim.keymap.set("v", "p", '"_dP')
