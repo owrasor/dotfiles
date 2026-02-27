@@ -48,3 +48,8 @@ opt.splitbelow = true -- split horizontal window to the bottom
 
 -- turn off swapfile
 opt.swapfile = false
+-- Garante renderização perfeita em terminais modernos como Ghostty
+opt.ttyfast = true
+-- Força o terminal a apagar o fundo corretamente se usar tmux ou conexões SSH
+-- Isso evita "faixas coloridas estranhas" passando do final das linhas de texto
+opt.t_ut = ""
