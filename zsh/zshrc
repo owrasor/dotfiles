@@ -19,6 +19,9 @@ HIST_STAMPS="mm/dd/yyyy"
 VI_MODE_SET_CURSOR=true
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
 
+# Fix Tmux Background Color Erase in Devpod by preventing OMZ Tmux plugin from overwriting term
+export ZSH_TMUX_FIXTERM_WITH_256COLOR="xterm-256color"
+
 #Need this custom plugin to add artisan commands
 #https://github.com/owrasor/zsh-artisan
 plugins=(
