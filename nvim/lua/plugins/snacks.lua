@@ -63,5 +63,13 @@ return {
 			end,
 			desc = "Keymaps",
 		},
+		{
+			"<F1>",
+			function()
+				Snacks.terminal.toggle(nil, { win = { position = "bottom", height = 0.4 } })
+			end,
+			desc = "Toggle Terminal",
+			mode = { "n", "t", "i" },
+		},
 	},
 }
