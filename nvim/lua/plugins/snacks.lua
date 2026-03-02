@@ -8,6 +8,7 @@ return {
 		dashboard = { enabled = true },
 		indent = {
 			enabled = true,
+			scope = { enabled = false },
 		},
 		picker = {
 			enabled = true,
