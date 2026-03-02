@@ -8,6 +8,7 @@ return {
 		dashboard = { enabled = true },
 		indent = {
 			enabled = true,
+			scope = { enabled = false }, -- Desabilita a linha guia (risco) do escopo atual
 		},
 		picker = {
 			enabled = true,
