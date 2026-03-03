@@ -6,24 +6,24 @@ windows:
       layout: main-horizontal
       panes:
         - sleep 1 && tmux resize-pane -Z -t aprovafacil:webserver.1 && rnvim webserver
-        - ssh -t aprovafacil.devpod "cd /workspace/aprovafacil-webserver && bash"
-        - ssh -t aprovafacil.devpod "cd /workspace/aprovafacil-webserver && bash"
+        - ssh -q -t aprovafacil.devpod "cd /workspace/aprovafacil-webserver && bash"
+        - ssh -q -t aprovafacil.devpod "cd /workspace/aprovafacil-webserver && bash"
   - webapp:
       layout: main-horizontal
       panes:
         - sleep 1 && tmux resize-pane -Z -t aprovafacil:webapp.1 && rnvim webapp
-        - ssh -t aprovafacil.devpod "cd /workspace/aprovafacil-webapp && bash"
-        - ssh -t aprovafacil.devpod "cd /workspace/aprovafacil-webapp && bash"
+        - ssh -q -t aprovafacil.devpod "cd /workspace/aprovafacil-webapp && bash"
+        - ssh -q -t aprovafacil.devpod "cd /workspace/aprovafacil-webapp && bash"
   - serverjs:
       layout: main-horizontal
       panes:
         - sleep 1 && tmux resize-pane -Z -t aprovafacil:serverjs.1 && rnvim serverjs
-        - ssh -t aprovafacil.devpod "cd /workspace/aprovafacil-serverjs && bash"
+        - ssh -q -t aprovafacil.devpod "cd /workspace/aprovafacil-serverjs && bash"
   - infra:
       layout: even-vertical
       panes:
-        - ssh -t aprovafacil.devpod "cd /workspace/aprovafacil-infra-dev && bash"
-        - ssh -t aprovafacil.devpod "cd /workspace/aprovafacil-infra-dev && bash"
+        - ssh -q -t aprovafacil.devpod "cd /workspace/aprovafacil-infra-dev && bash"
+        - ssh -q -t aprovafacil.devpod "cd /workspace/aprovafacil-infra-dev && bash"
   - AI:
       panes:
         - opencode

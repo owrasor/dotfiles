@@ -906,7 +906,7 @@ function rnvim() {
     
     if ! lsof -i:$port -t >/dev/null; then
         echo "🔌 Abrindo túnel SSH para porta $port e 8085 (OAuth)..."
-        ssh -f -N -L 8085:localhost:8085 -L $port:127.0.0.1:$port $host
+        ssh -f -N -q -L 8085:localhost:8085 -L $port:127.0.0.1:$port $host >/dev/null 2>&1
     else
         echo "⚡ Túnel já aberto na porta $port."
     fi
