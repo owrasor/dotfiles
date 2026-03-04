@@ -137,7 +137,10 @@ fi
 
 # Ensure Intelephense directory and license file exist
 mkdir -p "$HOME/intelephense"
-if [ ! -f "$HOME/intelephense/license.txt" ]; then
+if [ -f "$DOTFILES/intelephense.txt" ]; then
+    echo "Copying Intelephense license..."
+    cp "$DOTFILES/intelephense.txt" "$HOME/intelephense/license.txt"
+elif [ ! -f "$HOME/intelephense/license.txt" ]; then
     echo "Creating Intelephense license placeholder..."
     touch "$HOME/intelephense/license.txt"
 fi
