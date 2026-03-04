@@ -883,6 +883,14 @@ export PATH="$HOME/.opencode/bin:$PATH"
 
 export PATH="${ASDF_DATA_DIR:-$HOME/Apps/asdf}/bin:$PATH"
 
+# Fix SSH TERM glitch (missing terminfo fallback for modern GPU terminals over SSH)
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    if ! infocmp "$TERM" >/dev/null 2>&1; then
+        export TERM=xterm-256color
+    fi
+    export COLORTERM=truecolor
+fi
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
@@ -921,9 +929,8 @@ function rnvim() {
 
     echo "🚀 Conectando ao Neovim no DevPod ($target)..."
     
-    # Conecta via SSH com pseudo-terminal (-t) forçando variáveis de ambiente para evitar glitches
-    # E atrela ao tmux (cria se não existe, ou atacha se já existir) para rodar o nvim diretamente
-    ssh -t -q $host "export TERM=xterm-256color COLORTERM=truecolor; cd $remote_dir && tmux new-session -A -s $session_name 'nvim'"
+    # Conecta via SSH com pseudo-terminal (-t) e atrela ao tmux (cria se não existe, ou atacha se já existir) para rodar o nvim diretamente
+    ssh -t -q $host "export TERM=\$TERM COLORTERM=truecolor; cd $remote_dir && tmux new-session -A -s $session_name 'nvim'"
 
     # Quando o usuário sair do tmux ou nvim, a execução continua aqui
     echo "🧹 Limpando conexão..."
