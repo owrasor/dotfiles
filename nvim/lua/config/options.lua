@@ -46,12 +46,12 @@ if rnvim_port then
     vim.g.clipboard = {
         name = 'Remote/RNVIM',
         copy = {
-            ['+'] = {'sh', '-c', 'nc 127.0.0.1 ' .. clip_port},
-            ['*'] = {'sh', '-c', 'nc 127.0.0.1 ' .. clip_port},
+            ['+'] = {'bash', '-c', 'cat > /dev/tcp/127.0.0.1/' .. clip_port},
+            ['*'] = {'bash', '-c', 'cat > /dev/tcp/127.0.0.1/' .. clip_port},
         },
         paste = {
-            ['+'] = {'sh', '-c', 'nc -l ' .. clip_port}, -- In reverse, it does not work well without bidirectional, we will just support copy for now:
-            ['*'] = {'sh', '-c', 'nc -l ' .. clip_port},
+            ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+            ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
         },
     }
 else
