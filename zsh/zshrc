@@ -922,6 +922,7 @@ function rnvim() {
     echo "🚀 Conectando ao Neovim no DevPod ($target)..."
     
     # Conecta via SSH com pseudo-terminal (-t) e atrela ao tmux (cria se não existe, ou atacha se já existir) para rodar o nvim diretamente
+    # Força tmux a assumir cores de 24 bits
     ssh -t -q $host "export TERM=\$TERM COLORTERM=truecolor; cd $remote_dir && tmux new-session -A -s $session_name 'nvim'"
 
     # Quando o usuário sair do tmux ou nvim, a execução continua aqui
