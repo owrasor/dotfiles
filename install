@@ -110,6 +110,7 @@ fi
 # Link configuration files
 echo "Linking configuration files..."
 ln -sf "$DOTFILES/zsh/zshrc" "$HOME/.zshrc"
+ln -sf "$DOTFILES/zsh/p10k.zsh" "$HOME/.p10k.zsh"
 ln -sf "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
 
 # Link Tmuxinator configuration
