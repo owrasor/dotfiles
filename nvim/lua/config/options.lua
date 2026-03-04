@@ -39,18 +39,34 @@ opt.scrolloff = 8
 -- backspace
 opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
 
--- clipboard (Force OSC 52 unconditionally so headless servers can send clipboard frames to local UI)
-vim.g.clipboard = {
-    name = 'OSC 52',
-    copy = {
-        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-    },
-    paste = {
-        ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-        ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
-    },
-}
+-- clipboard (Force Netcat if RNVIM_PORT exists, else fallback to OSC 52)
+local rnvim_port = os.getenv("RNVIM_PORT")
+if rnvim_port then
+    local clip_port = "1" .. rnvim_port
+    vim.g.clipboard = {
+        name = 'Remote/RNVIM',
+        copy = {
+            ['+'] = {'sh', '-c', 'nc 127.0.0.1 ' .. clip_port},
+            ['*'] = {'sh', '-c', 'nc 127.0.0.1 ' .. clip_port},
+        },
+        paste = {
+            ['+'] = {'sh', '-c', 'nc -l ' .. clip_port}, -- In reverse, it does not work well without bidirectional, we will just support copy for now:
+            ['*'] = {'sh', '-c', 'nc -l ' .. clip_port},
+        },
+    }
+else
+    vim.g.clipboard = {
+        name = 'OSC 52',
+        copy = {
+            ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+            ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+        },
+        paste = {
+            ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+            ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+        },
+    }
+end
 opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
 -- split windows
