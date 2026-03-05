@@ -5,15 +5,19 @@ windows:
   - webserver:
       layout: main-horizontal
       panes:
-        - rnvim webserver
+        - cd aprovafacil-webserver && nvim
   - webapp:
       layout: main-horizontal
       panes:
-        - rnvim webapp
+        - cd aprovafacil-webapp && nvim
   - serverjs:
       layout: main-horizontal
       panes:
-        - rnvim serverjs
+        - cd aprovafacil-serverjs && nvim
+  - infra:
+      layout: main-horizontal
+      panes:
+        - cd aprovafacil-infra-dev
   - AI:
       panes:
-        - ssh -L 8085:localhost:8085 -q -t aprovafacil.devpod "zsh -ic 'cd /workspace && opencode'"
+        - opencode
