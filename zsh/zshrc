@@ -930,42 +930,29 @@ function rnvim() {
     # 1. Garante que o Neovim está rodando lá no DevPod naquela porta/pasta
     # O tmux cria a sessão apenas se ela não existir (-A não recria se já tiver)
     echo "⚙️  Preparando motor do Neovim no DevPod..."
-    ssh -q $host "tmux new-session -d -s $session_name 'cd $remote_dir && RNVIM_PORT=$port nvim --listen 127.0.0.1:$port --headless' 2>/dev/null || true"
+    ssh -q $host "tmux new-session -d -s $session_name 'cd $remote_dir && nvim --listen 127.0.0.1:$port --headless' 2>/dev/null || true"
 
     # Pequeno sleep só para dar tempo do Nvim remoto subir a porta
     sleep 1
 
-    # 2. Abre o túnel SSH silenciosamente, incluindo reverse port forwarding para um mini servidor de clipboard
-    local clip_port="1$port" # Ex: porta 16661 para clipboard
+    # 2. Abre o túnel SSH silenciosamente
     if ! lsof -i:$port -t >/dev/null; then
-        echo "🔌 Abrindo túnel SSH para porta $port, 8085 (OAuth) e Clipboard ($clip_port)..."
-        ssh -f -N -q -L 8085:localhost:8085 -L $port:127.0.0.1:$port -R 127.0.0.1:$clip_port:127.0.0.1:$clip_port $host >/dev/null 2>&1
+        echo "🔌 Abrindo túnel SSH para porta $port e 8085 (OAuth)..."
+        ssh -f -N -q -L 8085:localhost:8085 -L $port:127.0.0.1:$port $host >/dev/null 2>&1
     else
         echo "⚡ Túnel já ativo."
     fi
 
-    # Inicia o servidor local de clipboard (roda em background)
-    # Se receber alguma string, joga pra pbcopy via OSC52 local ou pbcopy/xclip
-    coproc (
-        while true; do
-            nc -l $clip_port | xclip -selection clipboard 2>/dev/null || nc -l $clip_port | pbcopy 2>/dev/null || ( 
-                nc -l $clip_port | while read -r line; do
-                    printf "\e]52;c;$(printf "%s" "$line" | base64 | tr -d '\n')\a"
-                done
-            )
-        done
-    )
-    local clipboard_pid=$!
-
-    # 3. Conecta a Interface Local passando variavel pro server saber onde enviar
+    # 3. Conecta a Interface Local
     echo "🚀 Conectando UI Local..."
-    # nvim --server "127.0.0.1:$port" --remote-send "<cmd>let g:remote_clip_port=$clip_port<cr>"
     nvim --server "127.0.0.1:$port" --remote-ui
 
     # 4. Limpeza Pós-fechamento
+    # Quando o usuário der :q na UI, a linha acima termina e o código continua aqui
+    # Mata o túnel SSH local referente à porta do Neovim (para não dar erro da próxima vez)
     echo "🧹 Limpando conexão..."
-    kill $clipboard_pid 2>/dev/null || true
     lsof -ti:$port | xargs kill -9 2>/dev/null || true
-    lsof -ti:$clip_port | xargs kill -9 2>/dev/null || true
+
+    # Mata a sessão remota no servidor, para que na próxima vez ela abra limpa e recarregue os plugins
     ssh -q $host "tmux kill-session -t $session_name 2>/dev/null" || true
 }
