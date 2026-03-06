@@ -14,10 +14,10 @@ windows:
       layout: main-horizontal
       panes:
         - cd aprovafacil-serverjs && nvim
-  - infra:
+  - workspace:
       layout: main-horizontal
       panes:
-        - cd aprovafacil-infra-dev
+        - ssh -q -t aprovafacil.devpod "zsh -ic 'cd /workspace'"
   - AI:
       panes:
         - opencode
