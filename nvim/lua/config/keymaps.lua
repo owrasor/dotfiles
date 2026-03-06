@@ -35,9 +35,6 @@ end, { desc = "Next error/warning todo comment" })
 
 vim.keymap.set("n", "<C-e>", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
--- Database commands
-vim.keymap.set("n", "<C-i>", "<CMD>DBUIToggle<CR>", { desc = "Open database" })
-
 local function toggle_diffview()
     local view = require("diffview.lib").get_current_view()
     if view then
