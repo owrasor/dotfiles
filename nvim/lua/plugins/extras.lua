@@ -11,6 +11,25 @@ return {
 	},
 	{
 		"christoomey/vim-tmux-navigator",
+		init = function()
+			-- Desativa os mapeamentos padrões quebrados do plugin no modo terminal
+			vim.g.tmux_navigator_no_mappings = 1
+		end,
+		config = function()
+			-- Atalhos para o modo Normal
+			vim.keymap.set("n", "<C-h>", "<Cmd>TmuxNavigateLeft<CR>", { silent = true })
+			vim.keymap.set("n", "<C-j>", "<Cmd>TmuxNavigateDown<CR>", { silent = true })
+			vim.keymap.set("n", "<C-k>", "<Cmd>TmuxNavigateUp<CR>", { silent = true })
+			vim.keymap.set("n", "<C-l>", "<Cmd>TmuxNavigateRight<CR>", { silent = true })
+			vim.keymap.set("n", "<C-\\>", "<Cmd>TmuxNavigatePrevious<CR>", { silent = true })
+
+			-- Atalhos corrigidos para o modo Terminal (escapando corretamente)
+			vim.keymap.set("t", "<C-h>", "<C-\\><C-n><Cmd>TmuxNavigateLeft<CR>", { silent = true })
+			vim.keymap.set("t", "<C-j>", "<C-\\><C-n><Cmd>TmuxNavigateDown<CR>", { silent = true })
+			vim.keymap.set("t", "<C-k>", "<C-\\><C-n><Cmd>TmuxNavigateUp<CR>", { silent = true })
+			vim.keymap.set("t", "<C-l>", "<C-\\><C-n><Cmd>TmuxNavigateRight<CR>", { silent = true })
+			vim.keymap.set("t", "<C-\\>", "<C-\\><C-n><Cmd>TmuxNavigatePrevious<CR>", { silent = true })
+		end,
 	},
 	{
 		"echasnovski/mini.nvim",
