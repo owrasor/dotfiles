@@ -17,7 +17,7 @@ windows:
   - workspace:
       layout: main-horizontal
       panes:
-        - ssh -q -t aprovafacil.devpod "zsh -ic 'cd /workspace'"
+        - ssh -q -t aprovafacil.devpod
   - AI:
       panes:
         - opencode
