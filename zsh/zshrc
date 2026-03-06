@@ -961,3 +961,7 @@ function rnvim() {
 if command -v mise >/dev/null 2>&1; then
     eval "$(mise activate zsh)"
 fi
+
+# Flutter
+export PATH="$PATH:$HOME/development/flutter/bin"
+export CHROME_EXECUTABLE="/usr/bin/google-chrome-stable"

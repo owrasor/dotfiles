@@ -22,6 +22,7 @@ return {
 			indent = { enable = true },
 			auto_install = true,
 			ensure_installed = {
+				"dart",
 				"bash",
 				"c",
 				"html",
