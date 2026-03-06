@@ -956,3 +956,8 @@ function rnvim() {
     # Mata a sessão remota no servidor, para que na próxima vez ela abra limpa e recarregue os plugins
     ssh -q $host "tmux kill-session -t $session_name 2>/dev/null" || true
 }
+
+# mise integration
+if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate zsh)"
+fi
