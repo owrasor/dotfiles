@@ -15,8 +15,25 @@ vim.keymap.set("n", "Y", "yg$", { desc = "Yank to end of line to system clipboar
 vim.keymap.set("v", "p", '"_dP')
 vim.keymap.set("v", "x", '"_x')
 
-vim.keymap.set("n", "<leader>cn", ':let @* = expand("%:t")<cr>', { desc = "Copy filename of current file to registry" })
-vim.keymap.set("n", "<leader>cp", ':let @* = expand("%")<cr>', { desc = "Copy path of current file to registry" })
+vim.keymap.set("n", "<leader>cn", function()
+    local filename = vim.fn.expand("%:t")
+    if filename ~= "" then
+        vim.fn.setreg("+", filename)
+        vim.fn.setreg("*", filename)
+        vim.fn.setreg('"', filename)
+        print("Copiado: " .. filename)
+    end
+end, { desc = "Copiar nome do arquivo para clipboard e registrador" })
+
+vim.keymap.set("n", "<leader>cp", function()
+    local path = vim.fn.expand("%")
+    if path ~= "" then
+        vim.fn.setreg("+", path)
+        vim.fn.setreg("*", path)
+        vim.fn.setreg('"', path)
+        print("Copiado: " .. path)
+    end
+end, { desc = "Copiar caminho do arquivo para clipboard e registrador" })
 
 -- TODO keymaps
 vim.keymap.set("n", "]t", function()
