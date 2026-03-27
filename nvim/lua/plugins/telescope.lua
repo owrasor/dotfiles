@@ -54,6 +54,7 @@ return {
 			keymap.set("n", "<leader>st", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 			keymap.set("n", "<leader>ss", builtin.lsp_document_symbols, { desc = "Find symbols" })
 			keymap.set("n", "<leader>sb", builtin.buffers, { desc = "Find Buffers" })
+			keymap.set("n", "<leader>sg", builtin.git_status, { desc = "Git Status" })
 			keymap.set("n", "<leader>sr", builtin.lsp_references, { desc = "Find references" })
 
 			require("config.telescope.multigrep").setup()
