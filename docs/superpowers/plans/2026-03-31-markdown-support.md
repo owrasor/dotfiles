@@ -49,7 +49,7 @@ git commit -m "feat(markdown): add marksman and markdownlint to mason"
 **Files:**
 - Create: `nvim/lua/plugins/markdown.lua`
 
-- [ ] **Step 1: Create the markdown plugin configuration file**
+- [x] **Step 1: Create the markdown plugin configuration file**
 
 ```lua
 return {
@@ -66,15 +66,18 @@ return {
 		build = function()
 			vim.fn["mkdp#util#install"]()
 		end,
+		keys = {
+			{ "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Toggle Markdown Preview" },
+		},
 	},
 }
 ```
 
-- [ ] **Step 2: Commit changes**
+- [x] **Step 2: Commit changes**
 
 ```bash
 git add nvim/lua/plugins/markdown.lua
-git commit -m "feat(markdown): add render-markdown and markdown-preview plugins"
+git commit -m "feat(markdown): add render-markdown and markdown-preview plugins with <leader>mp"
 ```
 
 ---
