@@ -66,6 +66,7 @@ return {
 					"prismals",
 					"intelephense",
 					"laravel_ls",
+					"marksman",
 					-- "pyright",
 				},
 			})
@@ -80,6 +81,7 @@ return {
 					"eslint_d",
 					"pint",
 					"php-debug-adapter",
+					"markdownlint",
 				},
 			})
 		end,
