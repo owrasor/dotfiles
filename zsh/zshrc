@@ -1,3 +1,11 @@
+# Fallback para o terminal Ghostty em conexões remotas (SSH/DevContainer)
+# Se o sistema não conhecer 'xterm-ghostty', rebaixamos para 'xterm-256color'
+if [[ "$TERM" == "xterm-ghostty" ]] && ! infocmp "$TERM" &>/dev/null; then
+    export TERM="xterm-256color"
+fi
+
+export TZ="America/Sao_Paulo"
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -6,12 +14,15 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 export ZSH="$HOME/.oh-my-zsh"
-# ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 HYPHEN_INSENSITIVE="true"
 COMPLETION_WAITING_DOTS="true"
 HIST_STAMPS="mm/dd/yyyy"
 VI_MODE_SET_CURSOR=true
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
+
+# Fix Tmux Background Color Erase in Devpod by preventing OMZ Tmux plugin from overwriting term
+export ZSH_TMUX_FIXTERM_WITH_256COLOR="screen-256color"
 
 #Need this custom plugin to add artisan commands
 #https://github.com/owrasor/zsh-artisan
@@ -811,6 +822,17 @@ restore_db() {
 # Miscellaneous
 #--------------------------------------------------------------------------
 
+# Copy to clipboard via OSC 52 (works over SSH)
+function pbcopy() {
+    local buffer
+    if [ -t 0 ]; then
+        buffer="$*"
+    else
+        buffer=$(cat)
+    fi
+    printf "\e]52;c;$(printf "%s" "$buffer" | base64 | tr -d '\n')\a"
+}
+
 ### Fix slowness of pastes with zsh-syntax-highlighting.zsh
 pasteinit() {
   OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
@@ -857,9 +879,18 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # opencode
-export PATH=/home/owrasor/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"
 
 export PATH="${ASDF_DATA_DIR:-$HOME/Apps/asdf}/bin:$PATH"
+
+
+# Fix SSH TERM glitch (missing terminfo fallback for modern GPU terminals over SSH)
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    if ! infocmp "$TERM" >/dev/null 2>&1; then
+        export TERM=xterm-256color
+    fi
+    export COLORTERM=truecolor
+fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -875,3 +906,74 @@ export PATH="$HOME/flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_H
 # Emulator Alias
 alias emu='emulator -avd pixel -no-snapshot-save'
 export CHROME_EXECUTABLE=/usr/bin/chromium-browser
+
+# Função para conectar ao Neovim Remoto no DevPod sob demanda
+function rnvim() {
+    local target=$1
+    local remote_dir=""
+    local port=""
+
+    case "$target" in
+        webserver) 
+            port="6661"
+            remote_dir="/workspace/aprovafacil-webserver"
+            ;;
+        serverjs) 
+            port="6662"
+            remote_dir="/workspace/aprovafacil-serverjs"
+            ;;
+        webapp) 
+            port="6663"
+            remote_dir="/workspace/aprovafacil-webapp"
+            ;;
+        root|"") 
+            port="6660"
+            remote_dir="/workspace"
+            ;;
+        *)
+            echo "Uso: rnvim [webserver|serverjs|webapp|root]"
+            return 1
+            ;;
+    esac
+
+    local host="aprovafacil.devpod"
+    local session_name="nvim_$target"
+
+    # 1. Garante que o Neovim está rodando lá no DevPod naquela porta/pasta
+    # O tmux cria a sessão apenas se ela não existir (-A não recria se já tiver)
+    echo "⚙️  Preparando motor do Neovim no DevPod..."
+    ssh -q $host "tmux new-session -d -s $session_name 'cd $remote_dir && nvim --listen 127.0.0.1:$port --headless' 2>/dev/null || true"
+
+    # Pequeno sleep só para dar tempo do Nvim remoto subir a porta
+    sleep 1
+
+    # 2. Abre o túnel SSH silenciosamente
+    if ! lsof -i:$port -t >/dev/null; then
+        echo "🔌 Abrindo túnel SSH para porta $port e 8085 (OAuth)..."
+        ssh -f -N -q -L 8085:localhost:8085 -L $port:127.0.0.1:$port $host >/dev/null 2>&1
+    else
+        echo "⚡ Túnel já ativo."
+    fi
+
+    # 3. Conecta a Interface Local
+    echo "🚀 Conectando UI Local..."
+    nvim --server "127.0.0.1:$port" --remote-ui
+
+    # 4. Limpeza Pós-fechamento
+    # Quando o usuário der :q na UI, a linha acima termina e o código continua aqui
+    # Mata o túnel SSH local referente à porta do Neovim (para não dar erro da próxima vez)
+    echo "🧹 Limpando conexão..."
+    lsof -ti:$port | xargs kill -9 2>/dev/null || true
+
+    # Mata a sessão remota no servidor, para que na próxima vez ela abra limpa e recarregue os plugins
+    ssh -q $host "tmux kill-session -t $session_name 2>/dev/null" || true
+}
+
+# mise integration
+if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate zsh)"
+fi
+
+# Flutter
+export PATH="$PATH:$HOME/development/flutter/bin"
+export CHROME_EXECUTABLE="/usr/bin/google-chrome-stable"

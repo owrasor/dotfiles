@@ -4,10 +4,6 @@ return {
 		version = "1.*",
 		dependencies = { "L3MON4D3/LuaSnip", version = "v2.*", "rafamadriz/friendly-snippets" },
 		config = function()
-			vim.cmd("highlight Pmenu guibg=none")
-			vim.cmd("highlight PmenuExtra guibg=none")
-			vim.cmd("highlight FloatBorder guibg=none")
-			vim.cmd("highlight NormalFloat guibg=none")
 			require("blink.cmp").setup({
 				snippets = { preset = "luasnip" },
 				signature = { enabled = true },
@@ -68,7 +64,7 @@ return {
 				},
 				completion = {
 					menu = {
-						border = nil,
+						border = "rounded",
 						scrolloff = 1,
 						scrollbar = false,
 						draw = {
@@ -82,7 +78,7 @@ return {
 					},
 					documentation = {
 						window = {
-							border = nil,
+							border = "rounded",
 							scrollbar = false,
 							winhighlight = "Normal:BlinkCmpDoc,FloatBorder:BlinkCmpDocBorder,EndOfBuffer:BlinkCmpDoc",
 						},

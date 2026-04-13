@@ -36,10 +36,18 @@ opt.background = "dark"
 opt.signcolumn = "yes"
 opt.scrolloff = 8
 
--- backspace
-opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
-
--- clipboard
+-- clipboard (Force OSC 52 unconditionally so headless servers can send clipboard frames to local UI)
+vim.g.clipboard = {
+    name = 'OSC 52',
+    copy = {
+        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+    },
+    paste = {
+        ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+    },
+}
 opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
 -- split windows
@@ -48,3 +56,5 @@ opt.splitbelow = true -- split horizontal window to the bottom
 
 -- turn off swapfile
 opt.swapfile = false
+-- Garante renderização perfeita em terminais modernos como Ghostty
+opt.ttyfast = true

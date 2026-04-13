@@ -55,6 +55,32 @@ return {
 	{
 		"sindrets/diffview.nvim",
 		event = "VeryLazy",
+		opts = {
+			keymaps = {
+				view = {
+					{ "n", "<C-h>", "<Cmd>TmuxNavigateLeft<CR>", { desc = "Navigate Left" } },
+					{ "n", "<C-j>", "<Cmd>TmuxNavigateDown<CR>", { desc = "Navigate Down" } },
+					{ "n", "<C-k>", "<Cmd>TmuxNavigateUp<CR>", { desc = "Navigate Up" } },
+					{ "n", "<C-l>", "<Cmd>TmuxNavigateRight<CR>", { desc = "Navigate Right" } },
+				},
+				file_panel = {
+					{ "n", "<C-h>", "<Cmd>TmuxNavigateLeft<CR>", { desc = "Navigate Left" } },
+					{ "n", "<C-j>", "<Cmd>TmuxNavigateDown<CR>", { desc = "Navigate Down" } },
+					{ "n", "<C-k>", "<Cmd>TmuxNavigateUp<CR>", { desc = "Navigate Up" } },
+					{ "n", "<C-l>", "<Cmd>TmuxNavigateRight<CR>", { desc = "Navigate Right" } },
+				},
+				file_history_panel = {
+					{ "n", "<C-h>", "<Cmd>TmuxNavigateLeft<CR>", { desc = "Navigate Left" } },
+					{ "n", "<C-j>", "<Cmd>TmuxNavigateDown<CR>", { desc = "Navigate Down" } },
+					{ "n", "<C-k>", "<Cmd>TmuxNavigateUp<CR>", { desc = "Navigate Up" } },
+					{ "n", "<C-l>", "<Cmd>TmuxNavigateRight<CR>", { desc = "Navigate Right" } },
+				},
+			},
+		},
+		keys = {
+			{ "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history" },
+			{ "<leader>gh", ":DiffviewFileHistory<cr>", mode = "v", desc = "Line history" },
+		},
 	},
 	{
 		"kdheepak/lazygit.nvim",
@@ -74,6 +100,7 @@ return {
 		keys = {
 			{ "<leader>lg", "<cmd>LazyGit<cr>", desc = "Open lazy git" },
 			{ "<leader>lc", "<cmd>LazyGitFilterCurrentFile<cr>", desc = "Open git log from current file" },
+			{ "<leader>lc", ":LazyGitFilterCurrentFile<cr>", mode = "v", desc = "Open git log from current file" },
 			{ "<leader>ll", "<cmd>LazyGitFilter<cr>", desc = "Open git log" },
 		},
 	},

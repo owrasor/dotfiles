@@ -7,6 +7,7 @@ return {
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			"nvim-tree/nvim-web-devicons",
 			"folke/todo-comments.nvim",
+			"ThePrimeagen/git-worktree.nvim",
 		},
 		config = function()
 			local telescope = require("telescope")
@@ -36,12 +37,28 @@ return {
 					},
 				},
 			})
+			require("git-worktree").setup({
+				update_on_change_command = "",
+			})
 
 			telescope.load_extension("fzf")
+			telescope.load_extension("git_worktree")
 
 			-- set keymaps
 			local keymap = vim.keymap -- for conciseness
 			local builtin = require("telescope.builtin")
+			keymap.set(
+				"n",
+				"<leader>tf",
+				"<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<cr>",
+				{ desc = "Fuzzy find worktrees" }
+			)
+			keymap.set(
+				"n",
+				"<leader>tc",
+				"<cmd>lua require('telescope').extensions.git_worktree.create_git_worktree()<cr>",
+				{ desc = "Fuzzy find worktrees" }
+			)
 			keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Fuzzy find files in cwd" })
 			keymap.set("n", "<leader>of", "<cmd>Telescope oldfiles<cr>", { desc = "Fuzzy find recent files" })
 			-- keymap.set("n", "<leader>/", "<cmd>Telescope live_grep<cr>", { desc = "Find string in cwd" })
@@ -54,6 +71,7 @@ return {
 			keymap.set("n", "<leader>st", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 			keymap.set("n", "<leader>ss", builtin.lsp_document_symbols, { desc = "Find symbols" })
 			keymap.set("n", "<leader>sb", builtin.buffers, { desc = "Find Buffers" })
+			keymap.set("n", "<leader>sg", builtin.git_status, { desc = "Git Status" })
 			keymap.set("n", "<leader>sr", builtin.lsp_references, { desc = "Find references" })
 
 			require("config.telescope.multigrep").setup()
