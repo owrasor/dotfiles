@@ -48,10 +48,10 @@ path=(
     $HOME/.cargo/bin
     $HOME/App/PhpStorm-231.8109.199/bin
     ./vendor/bin
-    ${ANDROID_HOME}tools/
-    ${ANDROID_HOME}platform-tools/
     $path
 )
+
+# Android SDK/Flutter removidos (limpo)
 
 setopt auto_cd
 cdpath=(
@@ -865,6 +865,13 @@ export PATH="${ASDF_DATA_DIR:-$HOME/Apps/asdf}/bin:$PATH"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 
-# opencode
-export PATH=/home/owras_picyvzc/.opencode/bin:$PATH
-export PATH="$PATH:$HOME/flutter/bin"
+# Opencode
+export PATH="/home/owras_picyvzc/.opencode/bin:$PATH"
+
+# Android & Flutter
+export ANDROID_HOME=$HOME/Android
+export PATH="$HOME/flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+
+# Emulator Alias
+alias emu='emulator -avd pixel -no-snapshot-save'
+export CHROME_EXECUTABLE=/usr/bin/chromium-browser
