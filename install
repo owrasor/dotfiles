@@ -136,6 +136,36 @@ if [ -d "$DOTFILES/nvim" ]; then
     ln -sfn "$DOTFILES/nvim" "$HOME/.config/nvim"
 fi
 
+# Link Pi agent resources
+if [ -d "$DOTFILES/pi" ]; then
+    mkdir -p "$HOME/.pi/agent/extensions"
+
+    link_pi_resource() {
+        local source="$1"
+        local target="$2"
+
+        if [ ! -e "$source" ]; then
+            return 0
+        fi
+
+        if [ -L "$target" ]; then
+            ln -sfn "$source" "$target"
+        elif [ -e "$target" ]; then
+            local backup="$target.backup-$(date +%Y%m%d%H%M%S)"
+            echo "Backing up existing Pi resource: $target -> $backup"
+            mv "$target" "$backup"
+            ln -sfn "$source" "$target"
+        else
+            ln -sfn "$source" "$target"
+        fi
+    }
+
+    link_pi_resource "$DOTFILES/pi/agents" "$HOME/.pi/agent/agents"
+    link_pi_resource "$DOTFILES/pi/prompts" "$HOME/.pi/agent/prompts"
+    link_pi_resource "$DOTFILES/pi/extensions/subagent" "$HOME/.pi/agent/extensions/subagent"
+    link_pi_resource "$DOTFILES/pi/extensions/dev-process" "$HOME/.pi/agent/extensions/dev-process"
+fi
+
 # Ensure Intelephense directory and license file exist
 mkdir -p "$HOME/intelephense"
 if [ -f "$DOTFILES/intelephense.txt" ]; then

@@ -965,3 +965,8 @@ fi
 # Flutter
 export PATH="$PATH:$HOME/development/flutter/bin"
 export CHROME_EXECUTABLE="/usr/bin/google-chrome-stable"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/owrasor/.lmstudio/bin"
+# End of LM Studio CLI section
+

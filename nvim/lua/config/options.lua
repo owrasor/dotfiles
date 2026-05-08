@@ -36,18 +36,21 @@ opt.background = "dark"
 opt.signcolumn = "yes"
 opt.scrolloff = 8
 
--- clipboard (Force OSC 52 unconditionally so headless servers can send clipboard frames to local UI)
-vim.g.clipboard = {
-    name = 'OSC 52',
-    copy = {
-        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-    },
-    paste = {
-        ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-        ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
-    },
-}
+-- clipboard: OSC 52 (Neovim 0.10+). Em versões antigas o módulo não existe.
+local ok_osc52, osc52 = pcall(require, "vim.ui.clipboard.osc52")
+if ok_osc52 then
+    vim.g.clipboard = {
+        name = "OSC 52",
+        copy = {
+            ["+"] = osc52.copy("+"),
+            ["*"] = osc52.copy("*"),
+        },
+        paste = {
+            ["+"] = osc52.paste("+"),
+            ["*"] = osc52.paste("*"),
+        },
+    }
+end
 opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
 -- split windows

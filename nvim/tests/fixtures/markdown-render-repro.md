@@ -1,0 +1,5 @@
+# Repro
+
+```lua
+print("hello")
+```
