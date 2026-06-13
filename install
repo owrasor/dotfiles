@@ -411,6 +411,32 @@ if [ -d "$DOTFILES/nvim" ]; then
     install_neovim_plugins || exit 1
 fi
 
+link_agent_skills() {
+    local skills_src="$DOTFILES/agents/skills"
+    local targets=(
+        "$HOME/.agents/skills"
+        "$HOME/.cursor/skills"
+        "$HOME/.pi/agent/skills"
+    )
+
+    [ -d "$skills_src" ] || return 0
+
+    mkdir -p "$HOME/.agents" "$HOME/.cursor" "$HOME/.pi/agent"
+
+    for target in "${targets[@]}"; do
+        if [ -L "$target" ]; then
+            ln -sfn "$skills_src" "$target"
+        elif [ -e "$target" ]; then
+            local backup="${target}.backup-$(date +%Y%m%d%H%M%S)"
+            echo "Backing up existing skills: $target -> $backup"
+            mv "$target" "$backup"
+            ln -sfn "$skills_src" "$target"
+        else
+            ln -sfn "$skills_src" "$target"
+        fi
+    done
+}
+
 # Link Ghostty configuration
 if [ -d "$DOTFILES/ghostty" ]; then
     mkdir -p "$HOME/.config"
@@ -427,6 +453,9 @@ if [ -d "$DOTFILES/ghostty" ]; then
         ln -sfn "$DOTFILES/ghostty" "$GHOSTTY_TARGET"
     fi
 fi
+
+# Link agent skills for Cursor, Pi, and ~/.agents
+link_agent_skills
 
 # Pi installation and packages
 install_pi || exit 1

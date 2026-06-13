@@ -13,6 +13,8 @@ O objetivo principal deste repositório é padronizar e automatizar a criação 
 - **Neovim** (Configurações customizadas)
 - **Lazygit** & **Lazydocker**
 - **Opencode** (com plugin Gemini OAuth)
+- **Pi** (agente de terminal com subagents, MCP e web access)
+- **Agent Skills** (skills pessoais para Cursor e Pi)
 - **Mise** para gerenciamento de runtimes
 - **PHP 8.4**, **Node 24** e **Composer** configurados globalmente para projetos Laravel
 - Utilitários e Compiladores: `ripgrep`, `fd`, `jq`, `curl`, `ruby`, `rustc`, `gcc`, `make`
@@ -54,6 +56,23 @@ O script detectará automaticamente o seu gerenciador de pacotes e providenciar�
 
 Durante a instalação, o script também instala o `mise`, ativa sua integração com o Zsh e configura globalmente `php@8.4` e `node@24`. As dependências de compilação necessárias para PHP/Laravel e o Composer também são provisionados automaticamente.
 
+## Agent Skills (Cursor e Pi)
+
+As skills pessoais ficam versionadas em `agents/skills/`. O script `install` cria symlinks globais para:
+
+- `~/.agents/skills`
+- `~/.cursor/skills`
+- `~/.pi/agent/skills`
+
+Edite as skills diretamente em `agents/skills/` neste repositório. Após alterações, rode `./install` novamente se precisar recriar os links (por exemplo, em uma máquina nova).
+
+Skills incluídas:
+
+- `frontend-design` — interfaces web com design de alta qualidade
+- `grill-with-docs` — stress-test de planos contra o domínio do projeto
+- `improve-codebase-architecture` — oportunidades de arquitetura e refatoração
+- `requesting-code-review` — revisão de código ao concluir tarefas
+
 ## 🔑 Configuração do Intelephense
 
 A licença do Intelephense (usada para funcionalidades avançadas em projetos PHP no Neovim) pode ser configurada de forma automática pelo script de instalação.
@@ -82,5 +101,6 @@ echo "SUA_CHAVE_AQUI" > ~/intelephense/license.txt
 - `/tmux` - Configurações do Tmux (`tmux.conf`).
 - `/tmuxinator` - Modelos e automações de sessões para o Tmuxinator.
 - `/nvim` - Configurações e plugins para a IDE baseada no Neovim.
+- `/agents/skills` - Skills pessoais para Cursor e Pi (`SKILL.md` por skill).
 - `/scripts` - Scripts auxiliares diversos.
 - `/ghostty`, `/alacritty`, `/wezterm` - Configurações para diferentes emuladores de terminal.
