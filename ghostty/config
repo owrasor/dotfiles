@@ -1,13 +1,11 @@
 window-padding-x = 10
 window-padding-y = 10
 window-decoration = none
-font-family = "MesloLGS Nerd Font Mono Bold"
-font-family = "MesloLGS Nerd Font Mono Bold"
-font-family-bold = "MesloLGS Nerd Font Mono Bold"
-font-family-italic = "MesloLGS Nerd Font Mono Bold"
-font-family-bold-italic = "MesloLGS Nerd Font Mono Bold"
-font-family-bold = true
-term = "xterm-256color"
+font-family = "MesloLGS Nerd Font Mono"
+font-family-bold = "MesloLGS Nerd Font Mono"
+font-family-italic = "MesloLGS Nerd Font Mono"
+font-family-bold-italic = "MesloLGS Nerd Font Mono"
+##term = "xterm-256color"
 font-thicken = true
 font-thicken-strength = 0
 window-colorspace = display-p3
@@ -17,7 +15,7 @@ background = #000000
 ##background-opacity = 0.65
 background-blur-radius = 20
 
-font-size = 16
+font-size = 14
 cursor-style = block
 cursor-style-blink = false
 cursor-invert-fg-bg = true
@@ -27,7 +25,6 @@ macos-option-as-alt = true
 mouse-hide-while-typing = true
 
 confirm-close-surface = false
-window-decoration = true
 window-padding-x = 10
 window-padding-y = 10
 window-padding-balance = true

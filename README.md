@@ -13,6 +13,8 @@ O objetivo principal deste repositório é padronizar e automatizar a criação 
 - **Neovim** (Configurações customizadas)
 - **Lazygit** & **Lazydocker**
 - **Opencode** (com plugin Gemini OAuth)
+- **Mise** para gerenciamento de runtimes
+- **PHP 8.4**, **Node 24** e **Composer** configurados globalmente para projetos Laravel
 - Utilitários e Compiladores: `ripgrep`, `fd`, `jq`, `curl`, `ruby`, `rustc`, `gcc`, `make`
 
 ## 🚀 Como Instalar e Utilizar
@@ -49,6 +51,8 @@ cd ~/.dotfiles
 ```
 
 O script detectará automaticamente o seu gerenciador de pacotes e providenciará a instalação limpa de todas as dependências, criação de atalhos (symlinks) e fará a troca para que o Zsh atue como terminal padrão.
+
+Durante a instalação, o script também instala o `mise`, ativa sua integração com o Zsh e configura globalmente `php@8.4` e `node@24`. As dependências de compilação necessárias para PHP/Laravel e o Composer também são provisionados automaticamente.
 
 ## 🔑 Configuração do Intelephense
 

@@ -2,6 +2,8 @@
 
 DOTFILES=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
+export PATH="$HOME/.local/bin:$PATH"
+
 # Function to install packages across different distributions
 install_pkg() {
     local pkg=$1
@@ -26,6 +28,261 @@ install_pkg() {
     fi
 }
 
+install_laravel_dependencies() {
+    echo "Installing Laravel/PHP build dependencies..."
+
+    if command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get update && sudo apt-get --yes install \
+            autoconf \
+            bison \
+            build-essential \
+            libcurl4-openssl-dev \
+            libedit-dev \
+            libffi-dev \
+            libfreetype6-dev \
+            libgd-dev \
+            libicu-dev \
+            libjpeg-dev \
+            libonig-dev \
+            libpng-dev \
+            libpq-dev \
+            libreadline-dev \
+            libsodium-dev \
+            libsqlite3-dev \
+            libssl-dev \
+            libwebp-dev \
+            libxml2-dev \
+            libzip-dev \
+            plocate \
+            pkg-config \
+            re2c \
+            unzip \
+            zip
+    elif command -v dnf >/dev/null 2>&1; then
+        sudo dnf install -y \
+            autoconf \
+            bison \
+            bzip2-devel \
+            gcc \
+            gcc-c++ \
+            libcurl-devel \
+            libedit-devel \
+            libffi-devel \
+            gd-devel \
+            libicu-devel \
+            libjpeg-turbo-devel \
+            libpng-devel \
+            libwebp-devel \
+            libxml2-devel \
+            libzip-devel \
+            make \
+            mlocate \
+            oniguruma-devel \
+            openssl-devel \
+            pkgconf-pkg-config \
+            postgresql-devel \
+            re2c \
+            readline-devel \
+            sqlite-devel \
+            unzip \
+            zip
+    elif command -v pacman >/dev/null 2>&1; then
+        sudo pacman -S --noconfirm --needed \
+            autoconf \
+            bison \
+            curl \
+            freetype2 \
+            gcc \
+            gd \
+            icu \
+            libedit \
+            libffi \
+            libjpeg-turbo \
+            libpng \
+            libwebp \
+            libxml2 \
+            libzip \
+            make \
+            mlocate \
+            oniguruma \
+            openssl \
+            pkgconf \
+            postgresql-libs \
+            re2c \
+            sqlite \
+            unzip \
+            zip
+    elif command -v zypper >/dev/null 2>&1; then
+        sudo zypper install -y \
+            autoconf \
+            bison \
+            gcc \
+            gcc-c++ \
+            libcurl-devel \
+            libedit-devel \
+            libffi-devel \
+            gd-devel \
+            libicu-devel \
+            libjpeg-devel \
+            libpng-devel \
+            libwebp-devel \
+            libxml2-devel \
+            libzip-devel \
+            make \
+            mlocate \
+            oniguruma-devel \
+            openssl-devel \
+            pkg-config \
+            postgresql-devel \
+            re2c \
+            readline-devel \
+            sqlite3-devel \
+            unzip \
+            zip
+    else
+        echo "Error: No supported package manager found. Please install Laravel/PHP build dependencies manually."
+        return 1
+    fi
+}
+
+install_mise() {
+    if command -v mise >/dev/null 2>&1; then
+        echo "Checking for mise: installed"
+        return 0
+    fi
+
+    echo "Installing mise..."
+    curl -fsSL https://mise.run | sh
+}
+
+activate_mise() {
+    if command -v mise >/dev/null 2>&1; then
+        eval "$(mise activate bash)"
+    fi
+}
+
+install_composer() {
+    if command -v composer >/dev/null 2>&1; then
+        echo "Checking for composer: installed"
+        return 0
+    fi
+
+    echo "Installing Composer..."
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+
+    php -r "copy('https://getcomposer.org/installer', '$tmp_dir/composer-setup.php');" || { rm -rf "$tmp_dir"; return 1; }
+    php "$tmp_dir/composer-setup.php" --install-dir="$HOME/.local/bin" --filename=composer || { rm -rf "$tmp_dir"; return 1; }
+    rm -rf "$tmp_dir"
+}
+
+setup_mise_tools() {
+    install_mise || return 1
+    activate_mise || return 1
+
+    echo "Installing global mise tools: PHP 8.4 and Node 24..."
+    mise use --global php@8.4.22 node@24 || return 1
+
+    install_composer || return 1
+}
+
+install_neovim() {
+    local version="0.12.0"
+    local arch
+    local checksum
+    local tmp_dir
+    local archive
+    local install_dir="$HOME/.local/share/nvim-linux-x86_64"
+
+    if nvim --version 2>/dev/null | grep -q "NVIM v${version}"; then
+        echo "Checking for nvim ${version}: installed"
+        return 0
+    fi
+
+    case "$(uname -m)" in
+        x86_64|amd64)
+            arch="x86_64"
+            checksum="160b69125defb16e60b283b69be112fd4850d67ac8f9a752328c20ad43ec34af"
+            ;;
+        aarch64|arm64)
+            arch="arm64"
+            checksum="89024e7be2ef3c8f08e9c002b1eb3e3b36672ee44bd6343cf2d168d38b3736b2"
+            install_dir="$HOME/.local/share/nvim-linux-arm64"
+            ;;
+        *)
+            echo "Error: unsupported architecture for Neovim install: $(uname -m)"
+            return 1
+            ;;
+    esac
+
+    echo "Installing Neovim ${version}..."
+    tmp_dir=$(mktemp -d)
+    archive="$tmp_dir/nvim-linux-${arch}.tar.gz"
+
+    curl -fsSL -o "$archive" "https://github.com/neovim/neovim/releases/download/v${version}/nvim-linux-${arch}.tar.gz" || { rm -rf "$tmp_dir"; return 1; }
+    printf '%s  %s\n' "$checksum" "$archive" | sha256sum -c - || { rm -rf "$tmp_dir"; return 1; }
+    tar -xzf "$archive" -C "$tmp_dir" || { rm -rf "$tmp_dir"; return 1; }
+    rm -rf "$install_dir"
+    mkdir -p "$HOME/.local/share" "$HOME/.local/bin" || { rm -rf "$tmp_dir"; return 1; }
+    mv "$tmp_dir/nvim-linux-${arch}" "$install_dir" || { rm -rf "$tmp_dir"; return 1; }
+    ln -sfn "$install_dir/bin/nvim" "$HOME/.local/bin/nvim" || { rm -rf "$tmp_dir"; return 1; }
+    rm -rf "$tmp_dir"
+}
+
+install_tree_sitter_cli() {
+    if command -v tree-sitter >/dev/null 2>&1; then
+        echo "Checking for tree-sitter: installed"
+        return 0
+    fi
+
+    if command -v npm >/dev/null 2>&1; then
+        echo "Installing tree-sitter CLI..."
+        npm install -g tree-sitter-cli
+        return $?
+    fi
+
+    echo "Error: npm is required to install tree-sitter-cli."
+    return 1
+}
+
+install_neovim_plugins() {
+    local parsers_lua
+
+    if ! command -v nvim >/dev/null 2>&1; then
+        echo "Error: nvim is required to install Neovim plugins."
+        return 1
+    fi
+
+    install_tree_sitter_cli || return 1
+
+    echo "Installing Neovim plugins..."
+    nvim --headless "+Lazy! restore" +qa || return 1
+
+    parsers_lua="'dart','bash','c','html','javascript','json','lua','luadoc','luap','markdown','markdown_inline','python','query','regex','tsx','typescript','vue','vim','vimdoc','yaml','proto','php','blade'"
+
+    echo "Installing Neovim Treesitter parsers..."
+    nvim --headless "+Lazy load nvim-treesitter" \
+        "+lua local parsers = { $parsers_lua }; local ok, res = require('nvim-treesitter').install(parsers, { summary = true }):pwait(1800000); if not ok or not res then vim.cmd.cq() end" \
+        +qa
+}
+
+install_pi() {
+    echo "Installing Pi..."
+    curl -fsSL https://pi.dev/install.sh | sh || return 1
+    hash -r
+
+    if ! command -v pi >/dev/null 2>&1; then
+        echo "Error: pi was installed, but it is not available in PATH."
+        return 1
+    fi
+
+    echo "Installing Pi packages..."
+    pi install npm:context-mode || return 1
+    pi install npm:pi-subagents || return 1
+    pi install npm:pi-mcp-adapter || return 1
+    pi install npm:pi-web-access || return 1
+}
+
 # Ensure dependencies are installed
 install_pkg zsh
 install_pkg curl
@@ -34,11 +291,14 @@ install_pkg tmux
 install_pkg jq
 install_pkg ruby
 install_pkg rustc
+install_laravel_dependencies || exit 1
+setup_mise_tools || exit 1
 
 # Neovim and dependencies
-install_pkg neovim nvim
+install_neovim
 install_pkg ripgrep rg
 install_pkg unzip
+install_pkg fontconfig fc-match
 if command -v apt-get >/dev/null 2>&1; then
     install_pkg build-essential make
     install_pkg fd-find fdfind
@@ -49,6 +309,20 @@ else
     install_pkg gcc
     install_pkg make
     install_pkg fd
+fi
+
+# Meslo Nerd Font installation
+if ! fc-match "MesloLGS Nerd Font Mono" | grep -q "MesloLGSNerdFontMono"; then
+    echo "Installing Meslo Nerd Font..."
+    MESLO_FONT_DIR="$HOME/.local/share/fonts/Meslo"
+    MESLO_FONT_ZIP=$(mktemp)
+    mkdir -p "$MESLO_FONT_DIR"
+    curl -fsSL -o "$MESLO_FONT_ZIP" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
+    unzip -o "$MESLO_FONT_ZIP" -d "$MESLO_FONT_DIR"
+    rm -f "$MESLO_FONT_ZIP"
+    fc-cache -f "$HOME/.local/share/fonts"
+else
+    echo "Checking for Meslo Nerd Font: installed"
 fi
 
 # Lazygit installation
@@ -134,37 +408,28 @@ fi
 if [ -d "$DOTFILES/nvim" ]; then
     mkdir -p "$HOME/.config"
     ln -sfn "$DOTFILES/nvim" "$HOME/.config/nvim"
+    install_neovim_plugins || exit 1
 fi
 
-# Link Pi agent resources
-if [ -d "$DOTFILES/pi" ]; then
-    mkdir -p "$HOME/.pi/agent/extensions"
+# Link Ghostty configuration
+if [ -d "$DOTFILES/ghostty" ]; then
+    mkdir -p "$HOME/.config"
+    GHOSTTY_TARGET="$HOME/.config/ghostty"
 
-    link_pi_resource() {
-        local source="$1"
-        local target="$2"
-
-        if [ ! -e "$source" ]; then
-            return 0
-        fi
-
-        if [ -L "$target" ]; then
-            ln -sfn "$source" "$target"
-        elif [ -e "$target" ]; then
-            local backup="$target.backup-$(date +%Y%m%d%H%M%S)"
-            echo "Backing up existing Pi resource: $target -> $backup"
-            mv "$target" "$backup"
-            ln -sfn "$source" "$target"
-        else
-            ln -sfn "$source" "$target"
-        fi
-    }
-
-    link_pi_resource "$DOTFILES/pi/agents" "$HOME/.pi/agent/agents"
-    link_pi_resource "$DOTFILES/pi/prompts" "$HOME/.pi/agent/prompts"
-    link_pi_resource "$DOTFILES/pi/extensions/subagent" "$HOME/.pi/agent/extensions/subagent"
-    link_pi_resource "$DOTFILES/pi/extensions/dev-process" "$HOME/.pi/agent/extensions/dev-process"
+    if [ -L "$GHOSTTY_TARGET" ]; then
+        ln -sfn "$DOTFILES/ghostty" "$GHOSTTY_TARGET"
+    elif [ -e "$GHOSTTY_TARGET" ]; then
+        GHOSTTY_BACKUP="$GHOSTTY_TARGET.backup-$(date +%Y%m%d%H%M%S)"
+        echo "Backing up existing Ghostty configuration: $GHOSTTY_TARGET -> $GHOSTTY_BACKUP"
+        mv "$GHOSTTY_TARGET" "$GHOSTTY_BACKUP"
+        ln -sfn "$DOTFILES/ghostty" "$GHOSTTY_TARGET"
+    else
+        ln -sfn "$DOTFILES/ghostty" "$GHOSTTY_TARGET"
+    fi
 fi
+
+# Pi installation and packages
+install_pi || exit 1
 
 # Ensure Intelephense directory and license file exist
 mkdir -p "$HOME/intelephense"

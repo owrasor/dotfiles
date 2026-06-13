@@ -3,11 +3,3 @@
 /.vscode
 /.vagrant
 intelephense.txt
-
-# Pi local/private state (do not commit credentials, local settings, or sessions)
-/pi/auth.json
-/pi/settings.json
-/pi/sessions/
-/pi/**/auth.json
-/pi/**/settings.json
-/pi/**/sessions/
