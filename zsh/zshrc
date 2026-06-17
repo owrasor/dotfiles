@@ -19,6 +19,10 @@ HYPHEN_INSENSITIVE="true"
 COMPLETION_WAITING_DOTS="true"
 HIST_STAMPS="mm/dd/yyyy"
 VI_MODE_SET_CURSOR=true
+VI_MODE_CURSOR_NORMAL=2
+VI_MODE_CURSOR_VISUAL=2
+VI_MODE_CURSOR_INSERT=2
+VI_MODE_CURSOR_OPPEND=2
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
 
 # Fix Tmux Background Color Erase in Devpod by preventing OMZ Tmux plugin from overwriting term
@@ -972,3 +976,4 @@ export CHROME_EXECUTABLE="/usr/bin/google-chrome-stable"
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/home/owrasor/.lmstudio/bin"
 # End of LM Studio CLI section
+
