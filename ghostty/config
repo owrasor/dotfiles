@@ -18,11 +18,19 @@ background-blur-radius = 20
 font-size = 14
 cursor-style = block
 cursor-style-blink = false
-cursor-invert-fg-bg = true
+# Cursor branco em bloco, com texto preto por baixo para manter contraste no terminal e no nvim.
+cursor-color = #ffffff
+cursor-text = #000000
+# Ghostty shell integration changes the cursor to a bar at the prompt by default.
+# Keep shell integration enabled, but disable only its cursor override.
+shell-integration-features = no-cursor
 
 macos-titlebar-style = hidden
 macos-option-as-alt = true
 mouse-hide-while-typing = true
+# Reduz a distância da rolagem da rodinha (padrão: discrete:3).
+# discrete:1 deixa a rolagem mais suave, avançando menos linhas por “clique”.
+mouse-scroll-multiplier = precision:1,discrete:1
 
 confirm-close-surface = false
 window-padding-x = 10

@@ -15,6 +15,27 @@ vim.api.nvim_create_user_command("LspRestart", function()
 	restart_lsp()
 end, {})
 
+vim.api.nvim_create_user_command("LspInfo", function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local lines = {
+		"LSP clients attached to current buffer:",
+		"filetype: " .. vim.bo[bufnr].filetype,
+	}
+
+	local clients = vim.lsp.get_clients({ bufnr = bufnr })
+	if #clients == 0 then
+		table.insert(lines, "none")
+	else
+		for _, client in ipairs(clients) do
+			local root = client.config.root_dir or client.root_dir or "-"
+			local code_action = client.server_capabilities.codeActionProvider and "yes" or "no"
+			table.insert(lines, string.format("- %s | root: %s | code actions: %s", client.name, root, code_action))
+		end
+	end
+
+	vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "LspInfo" })
+end, {})
+
 local function formatter_status()
 	local ok, conform = pcall(require, "conform")
 	if not ok then
