@@ -387,6 +387,14 @@ ln -sf "$DOTFILES/zsh/zshrc" "$HOME/.zshrc"
 ln -sf "$DOTFILES/zsh/p10k.zsh" "$HOME/.p10k.zsh"
 ln -sf "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
 
+# Link SSH configuration
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
+if [ -f "$DOTFILES/ssh/config" ]; then
+    ln -sf "$DOTFILES/ssh/config" "$HOME/.ssh/config"
+    chmod 600 "$DOTFILES/ssh/config"
+fi
+
 # Link Tmuxinator configuration
 mkdir -p "$HOME/.config"
 if [ -d "$DOTFILES/tmuxinator" ]; then

@@ -1,0 +1,23 @@
+Host aprova-prod
+    HostName aprovafacil.online
+    User ec2-user
+    IdentityFile ~/.ssh/id_rsa
+    IdentitiesOnly yes
+
+Host aprova-homolog
+    HostName homolog.aprovafacil.online
+    User ec2-user
+    IdentityFile ~/.ssh/id_rsa
+    IdentitiesOnly yes
+
+Host geo-demo
+    HostName 172.20.1.41
+    User fabio
+    PreferredAuthentications password
+    PubkeyAuthentication no
+
+Host geo-bc
+    HostName 172.20.4.110
+    User fabio
+    IdentityFile ~/.ssh/id_rsa
+    IdentitiesOnly yes
