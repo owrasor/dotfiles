@@ -36,22 +36,65 @@ opt.background = "dark"
 opt.signcolumn = "yes"
 opt.scrolloff = 8
 
--- clipboard: OSC 52 (Neovim 0.10+). Em versões antigas o módulo não existe.
-local ok_osc52, osc52 = pcall(require, "vim.ui.clipboard.osc52")
-if ok_osc52 then
+local is_herdr = vim.env.HERDR_ENV ~= nil
+local has_wayland_clipboard = vim.env.WAYLAND_DISPLAY ~= nil
+    and vim.fn.executable("wl-copy") == 1
+    and vim.fn.executable("wl-paste") == 1
+
+if is_herdr and not has_wayland_clipboard then
+    opt.clipboard = ""
+    local herdr_clipboard = { ["+"] = { {}, "v" }, ["*"] = { {}, "v" } }
     vim.g.clipboard = {
-        name = "OSC 52",
+        name = "Herdr local clipboard",
         copy = {
-            ["+"] = osc52.copy("+"),
-            ["*"] = osc52.copy("*"),
+            ["+"] = function(lines, regtype)
+                herdr_clipboard["+"] = { lines, regtype }
+            end,
+            ["*"] = function(lines, regtype)
+                herdr_clipboard["*"] = { lines, regtype }
+            end,
         },
         paste = {
-            ["+"] = osc52.paste("+"),
-            ["*"] = osc52.paste("*"),
+            ["+"] = function()
+                return herdr_clipboard["+"]
+            end,
+            ["*"] = function()
+                return herdr_clipboard["*"]
+            end,
         },
     }
+elseif has_wayland_clipboard then
+    vim.g.clipboard = {
+        name = "wl-clipboard",
+        copy = {
+            ["+"] = "wl-copy --type text/plain",
+            ["*"] = "wl-copy --primary --type text/plain",
+        },
+        paste = {
+            ["+"] = "wl-paste --no-newline",
+            ["*"] = "wl-paste --no-newline --primary",
+        },
+        cache_enabled = 0,
+    }
+    opt.clipboard:append("unnamedplus") -- use system clipboard as default register
+else
+    -- clipboard: OSC 52 (Neovim 0.10+). Em versões antigas o módulo não existe.
+    local ok_osc52, osc52 = pcall(require, "vim.ui.clipboard.osc52")
+    if ok_osc52 then
+        vim.g.clipboard = {
+            name = "OSC 52",
+            copy = {
+                ["+"] = osc52.copy("+"),
+                ["*"] = osc52.copy("*"),
+            },
+            paste = {
+                ["+"] = osc52.paste("+"),
+                ["*"] = osc52.paste("*"),
+            },
+        }
+    end
+    opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 end
-opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
 -- split windows
 opt.splitright = true -- split vertical window to the right

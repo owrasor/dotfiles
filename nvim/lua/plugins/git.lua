@@ -55,31 +55,49 @@ return {
 	{
 		"sindrets/diffview.nvim",
 		event = "VeryLazy",
+		cmd = {
+			"DiffviewOpen",
+			"DiffviewClose",
+			"DiffviewFileHistory",
+			"DiffviewFocusFiles",
+			"DiffviewToggleFiles",
+			"DiffviewRefresh",
+		},
+		init = function()
+			require("config.diffview_branch_path").setup()
+		end,
 		opts = {
 			keymaps = {
 				view = {
-					{ "n", "<C-h>", "<Cmd>TmuxNavigateLeft<CR>", { desc = "Navigate Left" } },
-					{ "n", "<C-j>", "<Cmd>TmuxNavigateDown<CR>", { desc = "Navigate Down" } },
-					{ "n", "<C-k>", "<Cmd>TmuxNavigateUp<CR>", { desc = "Navigate Up" } },
-					{ "n", "<C-l>", "<Cmd>TmuxNavigateRight<CR>", { desc = "Navigate Right" } },
+					{ "n", "<C-h>", "<Cmd>HerdrNavigateLeft<CR>", { desc = "Navigate Left" } },
+					{ "n", "<C-j>", "<Cmd>HerdrNavigateDown<CR>", { desc = "Navigate Down" } },
+					{ "n", "<C-k>", "<Cmd>HerdrNavigateUp<CR>", { desc = "Navigate Up" } },
+					{ "n", "<C-l>", "<Cmd>HerdrNavigateRight<CR>", { desc = "Navigate Right" } },
 				},
 				file_panel = {
-					{ "n", "<C-h>", "<Cmd>TmuxNavigateLeft<CR>", { desc = "Navigate Left" } },
-					{ "n", "<C-j>", "<Cmd>TmuxNavigateDown<CR>", { desc = "Navigate Down" } },
-					{ "n", "<C-k>", "<Cmd>TmuxNavigateUp<CR>", { desc = "Navigate Up" } },
-					{ "n", "<C-l>", "<Cmd>TmuxNavigateRight<CR>", { desc = "Navigate Right" } },
+					{ "n", "<C-h>", "<Cmd>HerdrNavigateLeft<CR>", { desc = "Navigate Left" } },
+					{ "n", "<C-j>", "<Cmd>HerdrNavigateDown<CR>", { desc = "Navigate Down" } },
+					{ "n", "<C-k>", "<Cmd>HerdrNavigateUp<CR>", { desc = "Navigate Up" } },
+					{ "n", "<C-l>", "<Cmd>HerdrNavigateRight<CR>", { desc = "Navigate Right" } },
 				},
 				file_history_panel = {
-					{ "n", "<C-h>", "<Cmd>TmuxNavigateLeft<CR>", { desc = "Navigate Left" } },
-					{ "n", "<C-j>", "<Cmd>TmuxNavigateDown<CR>", { desc = "Navigate Down" } },
-					{ "n", "<C-k>", "<Cmd>TmuxNavigateUp<CR>", { desc = "Navigate Up" } },
-					{ "n", "<C-l>", "<Cmd>TmuxNavigateRight<CR>", { desc = "Navigate Right" } },
+					{ "n", "<C-h>", "<Cmd>HerdrNavigateLeft<CR>", { desc = "Navigate Left" } },
+					{ "n", "<C-j>", "<Cmd>HerdrNavigateDown<CR>", { desc = "Navigate Down" } },
+					{ "n", "<C-k>", "<Cmd>HerdrNavigateUp<CR>", { desc = "Navigate Up" } },
+					{ "n", "<C-l>", "<Cmd>HerdrNavigateRight<CR>", { desc = "Navigate Right" } },
 				},
 			},
 		},
 		keys = {
 			{ "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history" },
 			{ "<leader>gh", ":DiffviewFileHistory<cr>", mode = "v", desc = "Line history" },
+			{
+				"<leader>gD",
+				function()
+					require("config.diffview_branch_path").prompt()
+				end,
+				desc = "Diffview branch/path compare",
+			},
 		},
 	},
 	{

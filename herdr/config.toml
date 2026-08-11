@@ -1,0 +1,73 @@
+onboarding = false
+
+[theme]
+name = "catppuccin"
+auto_switch = false
+
+[keys]
+# Port dos atalhos do tmux (~/.tmux.conf) para o Herdr.
+prefix = "ctrl+a"
+
+# Prefix-mode actions
+reload_config = "prefix+r"
+workspace_picker = "prefix+shift+o"
+# Navegação direta sem usar SUPER/Win, para evitar conflito com o Omarchy.
+# Alt+1..9 troca diretamente para a workspace correspondente.
+switch_workspace = "alt+1..9"
+# Similar para agentes: Alt+Shift+1..9 foca diretamente o agente correspondente na sidebar.
+focus_agent = "alt+shift+1..9"
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
+zoom = "prefix+m"
+resize_mode = ""
+
+# Navegação inteligente de panes, equivalente ao vim-tmux-navigator:
+# - fora do Neovim: move entre panes do Herdr;
+# - dentro do Neovim: entrega C-h/j/k/l ao Neovim, que navega splits internos e
+#   volta para o Herdr quando não houver split naquela direção.
+focus_pane_left = ""
+focus_pane_down = ""
+focus_pane_up = ""
+focus_pane_right = ""
+last_pane = "ctrl+backslash"
+
+[[keys.command]]
+key = "ctrl+h"
+type = "shell"
+command = "herdr-nvim-navigator left ctrl+h"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "shell"
+command = "herdr-nvim-navigator down ctrl+j"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "shell"
+command = "herdr-nvim-navigator up ctrl+k"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "shell"
+command = "herdr-nvim-navigator right ctrl+l"
+
+# Redimensionamento direto, equivalente a prefix+h/j/k/l no tmux.
+[[keys.command]]
+key = "prefix+h"
+type = "shell"
+command = "herdr pane resize --current --direction left --amount 5"
+
+[[keys.command]]
+key = "prefix+j"
+type = "shell"
+command = "herdr pane resize --current --direction down --amount 5"
+
+[[keys.command]]
+key = "prefix+k"
+type = "shell"
+command = "herdr pane resize --current --direction up --amount 5"
+
+[[keys.command]]
+key = "prefix+l"
+type = "shell"
+command = "herdr pane resize --current --direction right --amount 5"

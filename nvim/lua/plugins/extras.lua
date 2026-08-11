@@ -1,34 +1,21 @@
 return {
-	{ "numToStr/Comment.nvim", opts = {}, lazy = false },
-	{ "joosepalviste/nvim-ts-context-commentstring", lazy = true },
+	{
+		"folke/ts-comments.nvim",
+		event = "VeryLazy",
+		opts = {
+			lang = {
+				env = "# %s",
+				dotenv = "# %s",
+			},
+		},
+		enabled = vim.fn.has("nvim-0.10.0") == 1,
+	},
 	{
 		"stevearc/dressing.nvim",
 		dependencies = { "MunifTanjim/nui.nvim" },
 		opts = {},
 		config = function()
 			require("dressing").setup()
-		end,
-	},
-	{
-		"christoomey/vim-tmux-navigator",
-		init = function()
-			-- Desativa os mapeamentos padrões quebrados do plugin no modo terminal
-			vim.g.tmux_navigator_no_mappings = 1
-		end,
-		config = function()
-			-- Atalhos para o modo Normal
-			vim.keymap.set("n", "<C-h>", "<Cmd>TmuxNavigateLeft<CR>", { silent = true })
-			vim.keymap.set("n", "<C-j>", "<Cmd>TmuxNavigateDown<CR>", { silent = true })
-			vim.keymap.set("n", "<C-k>", "<Cmd>TmuxNavigateUp<CR>", { silent = true })
-			vim.keymap.set("n", "<C-l>", "<Cmd>TmuxNavigateRight<CR>", { silent = true })
-			vim.keymap.set("n", "<C-\\>", "<Cmd>TmuxNavigatePrevious<CR>", { silent = true })
-
-			-- Atalhos corrigidos para o modo Terminal (escapando corretamente)
-			vim.keymap.set("t", "<C-h>", "<C-\\><C-n><Cmd>TmuxNavigateLeft<CR>", { silent = true })
-			vim.keymap.set("t", "<C-j>", "<C-\\><C-n><Cmd>TmuxNavigateDown<CR>", { silent = true })
-			vim.keymap.set("t", "<C-k>", "<C-\\><C-n><Cmd>TmuxNavigateUp<CR>", { silent = true })
-			vim.keymap.set("t", "<C-l>", "<C-\\><C-n><Cmd>TmuxNavigateRight<CR>", { silent = true })
-			vim.keymap.set("t", "<C-\\>", "<C-\\><C-n><Cmd>TmuxNavigatePrevious<CR>", { silent = true })
 		end,
 	},
 	{
@@ -39,6 +26,12 @@ return {
 			require("mini.surround").setup()
 
 			require("mini.pairs").setup()
+
+			-- Neovim >= 0.10 already provides gc/gcc. mini.comment is only
+			-- enabled as a fallback when the native commenting maps do not exist.
+			if vim.fn.has("nvim-0.10.0") == 0 then
+				require("mini.comment").setup()
+			end
 
 			require("mini.move").setup({
 				mappings = {

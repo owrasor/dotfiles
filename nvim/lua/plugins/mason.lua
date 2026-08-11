@@ -28,6 +28,7 @@ return {
 			},
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 			{ "antosha417/nvim-lsp-file-operations", config = true },
+			"b0o/SchemaStore.nvim",
 			"saghen/blink.cmp",
 		},
 		config = function()
@@ -60,6 +61,8 @@ return {
 					"cssls",
 					"tailwindcss",
 					"svelte",
+					"jsonls",
+					"yamlls",
 					"lua_ls",
 					"graphql",
 					"emmet_ls",
@@ -70,6 +73,8 @@ return {
 					-- "pyright",
 				},
 			})
+
+			vim.lsp.enable("perlnavigator")
 
 			mason_tool_installer.setup({
 				ensure_installed = {
@@ -82,6 +87,7 @@ return {
 					"pint",
 					"php-debug-adapter",
 					"markdownlint",
+					"perlnavigator",
 				},
 			})
 		end,

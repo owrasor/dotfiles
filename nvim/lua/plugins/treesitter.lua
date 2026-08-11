@@ -22,6 +22,7 @@ local parsers = {
 	"proto",
 	"php",
 	"blade",
+	"perl",
 }
 
 local function map(mode, lhs, rhs, desc)

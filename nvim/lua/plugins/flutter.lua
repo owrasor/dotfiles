@@ -28,12 +28,6 @@ return {
 				run_via_dap = true,
 			},
 			lsp = {
-				color = { -- Mostra as cores do Tailwind/Flutter diretamente no código
-					enabled = true,
-					background = false,
-					foreground = false,
-					virtual_text = true,
-				},
 				capabilities = capabilities,
 			},
 		})

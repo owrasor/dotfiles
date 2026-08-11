@@ -1,3 +1,5 @@
+require("config.herdr_navigator").setup()
+
 -- Move blocks up and down
 vim.keymap.set("v", "<M-Down>", ":m '>+1<CR>gv=gv", { desc = "Move lines down in visual selection" })
 vim.keymap.set("v", "<M-Up>", ":m '<-2<CR>gv=gv", { desc = "Move lines up in visual selection" })

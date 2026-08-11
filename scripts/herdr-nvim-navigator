@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Smart Ctrl+h/j/k/l navigation for Herdr + Neovim.
+# If the focused Herdr pane is running Neovim, pass the key through so Neovim
+# can move between its own windows and fall back to Herdr at the edge.
+# Otherwise, move directly between Herdr panes.
+
+direction="${1:-}"
+key="${2:-}"
+
+case "$direction" in
+    left|down|up|right) ;;
+    *)
+        echo "Usage: herdr-nvim-navigator <left|down|up|right> [key]" >&2
+        exit 2
+        ;;
+esac
+
+if [ -z "$key" ]; then
+    case "$direction" in
+        left) key="ctrl+h" ;;
+        down) key="ctrl+j" ;;
+        up) key="ctrl+k" ;;
+        right) key="ctrl+l" ;;
+    esac
+fi
+
+current_json="$(herdr pane current --current)"
+pane_id="$(printf '%s' "$current_json" | jq -r '.result.pane.pane_id // empty')"
+
+process_json="$(herdr pane process-info --current 2>/dev/null || true)"
+is_nvim="$(printf '%s' "$process_json" | jq -r '
+    [ .result.process_info.foreground_processes[]? |
+      ((.name // "") + " " + (.cmdline // "") + " " + ((.argv // []) | join(" ")))
+    ] | any(test("(^|[/[:space:]-])(n?vim|view)([[:space:]]|$)"))
+')"
+
+if [ "$is_nvim" = "true" ] && [ -n "$pane_id" ]; then
+    exec herdr pane send-keys "$pane_id" "$key"
+fi
+
+exec herdr pane focus --current --direction "$direction"

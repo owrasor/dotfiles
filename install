@@ -283,13 +283,32 @@ install_pi() {
     pi install npm:pi-web-access || return 1
 }
 
+install_herdr() {
+    if command -v herdr >/dev/null 2>&1; then
+        echo "Checking for herdr: installed"
+        return 0
+    fi
+
+    echo "Installing Herdr..."
+    curl -fsSL https://herdr.dev/install.sh | sh || return 1
+    hash -r
+
+    if ! command -v herdr >/dev/null 2>&1; then
+        echo "Error: herdr was installed, but it is not available in PATH."
+        return 1
+    fi
+}
+
 # Ensure dependencies are installed
 install_pkg zsh
 install_pkg curl
 install_pkg git
-install_pkg tmux
+# Tmux installation kept commented in case I decide to use it again.
+# install_pkg tmux
+install_herdr || exit 1
 install_pkg jq
-install_pkg ruby
+# Tmuxinator dependency kept commented in case I decide to use Tmux again.
+# install_pkg ruby
 install_pkg rustc
 install_laravel_dependencies || exit 1
 setup_mise_tools || exit 1
@@ -346,13 +365,13 @@ else
     echo "Checking for lazydocker: installed"
 fi
 
-# Tmuxinator installation
-if ! command -v tmuxinator >/dev/null 2>&1; then
-    echo "Installing Tmuxinator..."
-    sudo gem install tmuxinator
-else
-    echo "Checking for tmuxinator: installed"
-fi
+# Tmuxinator installation kept commented in case I decide to use Tmux again.
+# if ! command -v tmuxinator >/dev/null 2>&1; then
+#     echo "Installing Tmuxinator..."
+#     sudo gem install tmuxinator
+# else
+#     echo "Checking for tmuxinator: installed"
+# fi
 
 # Oh My Zsh installation
 DIR="$HOME/.oh-my-zsh"
@@ -385,7 +404,12 @@ fi
 echo "Linking configuration files..."
 ln -sf "$DOTFILES/zsh/zshrc" "$HOME/.zshrc"
 ln -sf "$DOTFILES/zsh/p10k.zsh" "$HOME/.p10k.zsh"
-ln -sf "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
+# Tmux configuration link kept commented in case I decide to use Tmux again.
+# ln -sf "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
+if [ -f "$DOTFILES/herdr/config.toml" ]; then
+    mkdir -p "$HOME/.config/herdr"
+    ln -sf "$DOTFILES/herdr/config.toml" "$HOME/.config/herdr/config.toml"
+fi
 
 # Link SSH configuration
 mkdir -p "$HOME/.ssh"
@@ -395,16 +419,19 @@ if [ -f "$DOTFILES/ssh/config" ]; then
     chmod 600 "$DOTFILES/ssh/config"
 fi
 
-# Link Tmuxinator configuration
+# Link Tmuxinator configuration kept commented in case I decide to use Tmux again.
 mkdir -p "$HOME/.config"
-if [ -d "$DOTFILES/tmuxinator" ]; then
-    ln -sfn "$DOTFILES/tmuxinator" "$HOME/.config/tmuxinator"
-fi
+# if [ -d "$DOTFILES/tmuxinator" ]; then
+#     ln -sfn "$DOTFILES/tmuxinator" "$HOME/.config/tmuxinator"
+# fi
 
 # Ensure local bin exists and link custom scripts
 mkdir -p "$HOME/.local/bin"
 if [ -f "$DOTFILES/scripts/t" ]; then
     ln -sf "$DOTFILES/scripts/t" "$HOME/.local/bin/t"
+fi
+if [ -f "$DOTFILES/scripts/herdr-nvim-navigator" ]; then
+    ln -sf "$DOTFILES/scripts/herdr-nvim-navigator" "$HOME/.local/bin/herdr-nvim-navigator"
 fi
 
 # Fix for fd in Ubuntu/Debian

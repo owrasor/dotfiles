@@ -54,7 +54,20 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		end, opts) -- jump to next diagnostic in buffer
 
 		opts.desc = "Show documentation for what is under cursor"
-		keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+		keymap.set("n", "K", function()
+			local clients = vim.lsp.get_clients({ bufnr = ev.buf })
+			for _, client in ipairs(clients) do
+				if client.server_capabilities.hoverProvider then
+					return vim.lsp.buf.hover()
+				end
+			end
+
+			-- Evita erro quando só há Copilot ou nenhum LSP com hover no buffer.
+			-- Não cai no `normal! K`, porque em Perl isso abre `perldoc -f <palavra>`
+			-- e gera terminais ruidosos para métodos/helper como `session`.
+			-- Também não notifica: pressionar K em regiões sem hover deve ser silencioso.
+			return nil
+		end, opts) -- show documentation for what is under cursor
 
 		opts.desc = "Restart LSP"
 		keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
@@ -135,3 +148,22 @@ api.nvim_create_autocmd("FileType", {
 		end
 	end,
 })
+
+api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+	pattern = { "*.html.ep" },
+	callback = function()
+		vim.bo.filetype = "html"
+	end,
+})
+
+api.nvim_create_user_command("PerlProveFile", function()
+	vim.cmd("terminal PERL5LIB=$HOME/perl5/lib/perl5 prove -l %")
+end, {})
+
+api.nvim_create_user_command("PerlProveAll", function()
+	vim.cmd("terminal PERL5LIB=$HOME/perl5/lib/perl5 prove -l t/")
+end, {})
+
+api.nvim_create_user_command("PerlCritic", function()
+	vim.cmd("terminal PATH=$HOME/perl5/bin:$PATH PERL5LIB=$HOME/perl5/lib/perl5 perlcritic %")
+end, {})

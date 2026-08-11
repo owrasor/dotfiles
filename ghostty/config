@@ -17,7 +17,7 @@ background-blur-radius = 20
 
 font-size = 14
 cursor-style = block
-cursor-style-blink = false
+cursor-style-blink = true
 # Cursor branco em bloco, com texto preto por baixo para manter contraste no terminal e no nvim.
 cursor-color = #ffffff
 cursor-text = #000000
@@ -42,3 +42,5 @@ auto-update-channel = stable
 
 keybind = alt+left=unbind
 keybind = alt+right=unbind
+# Send real CSI-u Shift+Enter so tmux/pi can distinguish it from Ctrl+J.
+keybind = shift+enter=csi:13;2u

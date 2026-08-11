@@ -5,6 +5,11 @@ return {
 		local conform = require("conform")
 
 		conform.setup({
+			formatters = {
+				perltidy = {
+					command = vim.fn.expand("~/perl5/bin/perltidy"),
+				},
+			},
 			formatters_by_ft = {
 				javascript = { "eslint_d", "prettier" },
 				typescript = { "eslint_d", "prettier" },
@@ -22,14 +27,23 @@ return {
 				lua = { "stylua" },
 				python = { "isort", "black" },
 				php = { "pint", "prettier" },
+				perl = { "perltidy" },
 				scss = { "prettier" },
 				sh = { "shfmt" },
 			},
-			format_on_save = {
-				lsp_fallback = true,
-				async = false,
-				timeout_ms = 2500,
-			},
+			format_on_save = function(bufnr)
+				-- Perl neste repo não tem .perltidyrc; evite diffs grandes automáticos.
+				-- Use <leader>cf para formatar manualmente quando quiser.
+				if vim.bo[bufnr].filetype == "perl" then
+					return nil
+				end
+
+				return {
+					lsp_fallback = true,
+					async = false,
+					timeout_ms = 2500,
+				}
+			end,
 		})
 
 		vim.keymap.set({ "n", "v" }, "<leader>cf", function()

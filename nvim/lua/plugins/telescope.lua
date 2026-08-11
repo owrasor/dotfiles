@@ -75,6 +75,7 @@ return {
 			keymap.set("n", "<leader>sr", builtin.lsp_references, { desc = "Find references" })
 
 			require("config.telescope.multigrep").setup()
+			require("config.telescope.git_file_history").setup()
 		end,
 	},
 	{
